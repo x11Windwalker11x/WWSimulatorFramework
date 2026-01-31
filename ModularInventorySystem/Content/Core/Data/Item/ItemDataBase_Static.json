@@ -1,0 +1,61 @@
+{
+  "description": "Item database for ModularInventoryInteractableSystem plugin - contains all pickup items with their meshes, sounds, and montages for proximity-based loading",
+  "version": "1.0",
+  "last_updated": "2024-12-21",
+  "Items": [
+    {
+      "ItemID": "HealthPotion",
+      "DisplayName": "Health Potion",
+      "Description": "Restores 50 HP",
+      "Weight": 0.5,
+      "MaxStackSize": 10,
+      "Soft_SM_Mesh": "/Game/Meshes/SM_HealthPotion.SM_HealthPotion",
+      "Soft_SK_Mesh": "",
+      "EditorPreviewMesh_Soft": "/Game/Meshes/SM_HealthPotion.SM_HealthPotion",
+      "EditorPreviewSKMesh_Soft": "",
+      "PickupMontage": "/Game/Animations/Pickup_Montage.Pickup_Montage",
+      "DropMontage": "",
+      "UseMontage": "",
+      "PickupSound": "/Game/Sounds/Pickup_Cue.Pickup_Cue",
+      "DropSound": "",
+      "UseSound": "",
+      "GameplayTags": "Interactable.Item"
+    },
+    {
+      "ItemID": "Test_Item",
+      "DisplayName": "Test Item",
+      "Description": "Dummy Item for testing the system",
+      "Weight": 0.1,
+      "MaxStackSize": 99,
+      "Soft_SM_Mesh": "/ModularInventoryInteractableSystem/Core/Actors/Pickups/SM_TestItem.SM_TestItem",
+      "Soft_SK_Mesh": "",
+      "EditorPreviewMesh_Soft": "/ModularInventoryInteractableSystem/Core/Actors/Pickups/SM_TestItem.SM_TestItem",
+      "EditorPreviewSKMesh_Soft": "",
+      "PickupMontage": "",
+      "DropMontage": "",
+      "UseMontage": "",
+      "PickupSound": "",
+      "DropSound": "",
+      "UseSound": "",
+      "GameplayTags": "Interactable.Item"
+    },
+    {
+      "ItemID": "PC",
+      "DisplayName": "Computer",
+      "Description": "Interactable computer terminal",
+      "Weight": 5.0,
+      "MaxStackSize": 1,
+      "Soft_SM_Mesh": "/Game/TPPTemplate/ThirdPerson/_GENERATED/Admin/PCPart.PCPart",
+      "Soft_SK_Mesh": "",
+      "EditorPreviewMesh_Soft": "/Game/TPPTemplate/ThirdPerson/_GENERATED/Admin/PCPart.PCPart",
+      "EditorPreviewSKMesh_Soft": "/Game/TPPTemplate/ThirdPerson/_GENERATED/Admin/PCPart.PCPart",
+      "PickupMontage": "",
+      "DropMontage": "",
+      "UseMontage": "",
+      "PickupSound": "",
+      "DropSound": "",
+      "UseSound": "",
+      "GameplayTags": "Interactable.Container,Interaction.Action.Use,Interaction.State.Available"
+    }
+  ]
+}

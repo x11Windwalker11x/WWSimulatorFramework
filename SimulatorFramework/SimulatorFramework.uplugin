@@ -1,0 +1,38 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1 beta",
+	"FriendlyName": "SimulatorFramework",
+	"Description": "Basic simulator mechanics for both simple and complex devices and interactables Handles Interactable Interactable devices like pc, phone (smart), gas pump, security cams, implements durability, power monitoring, repair systems. ",
+	"Category": "GameplayFramework",
+	"CreatedBy": "Windwalker",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "SimulatorFramework",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "AdvancedWidgetFramework",
+			"Enabled": true
+		},
+		{
+			"Name": "Windwalker_Productions_SharedDefaults",
+			"Enabled": true
+		},
+		{
+			"Name": "ModularInventorySystem",
+			"Enabled": true
+		}
+	]
+}

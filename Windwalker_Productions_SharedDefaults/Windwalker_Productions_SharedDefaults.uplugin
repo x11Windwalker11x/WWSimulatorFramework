@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "Windwalker_Productions_SharedDefaults",
+	"Description": "Shared Plugin For Constants and Defaults",
+	"Category": "Core",
+	"CreatedBy": "Windwalker",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "Windwalker_Productions_SharedDefaults",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

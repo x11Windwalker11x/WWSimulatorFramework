@@ -1,0 +1,32 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "ModularCheatManager",
+	"Description": "",
+	"Category": "Core",
+	"CreatedBy": "Windwalker",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ModularCheatManager",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModularInventorySystem",
+			"Type": "Runtime",
+			"Enabled": true,
+			"LoadingPhase": "Default"
+		}
+	]
+}

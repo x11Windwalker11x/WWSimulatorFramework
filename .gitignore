@@ -1,0 +1,16 @@
+Binaries/
+Intermediate/
+DerivedDataCache/
+*.pdb
+*.obj
+*.dll
+*.exe
+*.lib
+*.exp
+.vs/
+.idea/
+*.sln
+*.suo
+*.user
+Saved/
+Build/

@@ -1,0 +1,38 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "ModularInteractionSystem",
+	"Description": "",
+	"Category": "InventoryInteractableFramework",
+	"CreatedBy": "Windwalker",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ModularInteractionSystem",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Windwalker_Productions_SharedDefaults",
+			"Enabled": true
+		},
+      {
+        "Name": "ModularSystemsBase",
+        "Enabled": true
+      },
+        {
+          "Name": "AdvancedWidgetFramework",
+          "Enabled": true
+        }
+	]
+}

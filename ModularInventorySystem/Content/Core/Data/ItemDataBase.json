@@ -1,0 +1,36 @@
+{
+  "Items": [
+    {
+      "ItemID": "HealthPotion",
+      "DisplayName": "Health Potion",
+      "Description": "Restores 50 HP",
+      "Weight": 0.5,
+      "MaxStackSize": 10,
+      "Soft_SM_Mesh": "/Game/Meshes/SM_HealthPotion.SM_HealthPotion",
+      "Soft_SK_Mesh": "",
+      "PickupMontage": "/Game/Animations/Pickup_Montage.Pickup_Montage",
+      "DropMontage": "",
+      "UseMontage": "",
+      "PickupSound": "/Game/Sounds/Pickup_Cue.Pickup_Cue",
+      "DropSound": "",
+      "UseSound": "",
+      "GameplayTags": "Consumable,Health"
+    },
+    {
+      "ItemID": "PC",
+      "DisplayName": "Computer",
+      "Description": "Interactable computer terminal",
+      "Weight": 5.0,
+      "MaxStackSize": 1,
+      "Soft_SM_Mesh": "Game/TPPTemplate/ThirdPerson/_GENERATED/Admin",
+      "Soft_SK_Mesh": "",
+      "PickupMontage": "",
+      "DropMontage": "",
+      "UseMontage": "",
+      "PickupSound": "",
+      "DropSound": "",
+      "UseSound": "",
+      "GameplayTags": "Interactable.Container, Interaction.Action.Use, Interaction.State.Avalaible"
+    }
+  ]
+}

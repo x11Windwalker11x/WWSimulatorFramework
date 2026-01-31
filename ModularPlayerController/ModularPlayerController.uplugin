@@ -1,0 +1,121 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "ModularPlayerController",
+	"Description": "",
+	"Category": "GameplayFramework",
+	"CreatedBy": "Windwalker",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ModularPlayerController",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Windwalker_Productions_SharedDefaults",
+			"Type": "Runtime",
+			"Enabled": true,
+			"LoadingPhase": "PostEngineInit"
+		},
+      {
+        "Name": "AdvancedWidgetFramework",
+        "Enabled": true
+      },
+        {
+          "Name": "ModularSaveGameSystem",
+          "Type": "Runtime",
+          "Enabled": true,
+          "LoadingPhase": "Default"
+        },
+        {
+          "Name": "AdvancedWidgetFramework",
+          "Enabled": true
+        },
+		{
+			"Name": "ModularInventorySystem",
+			"Type": "Runtime",
+			"Enabled": true,
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "ModularInteractionSystem",
+			"Type": "Runtime",
+			"Enabled": true,
+			"LoadingPhase": "PostEngineInit"
+		},
+		{
+			"Name": "ModularCheatManager",
+			"Type": "Runtime",
+			"Enabled": true,
+			"LoadingPhase": "Default"
+		},
+      {
+        "Name": "Windwalker_Productions_SharedDefaults",
+        "Type": "Runtime",
+        "Enabled": true,
+        "LoadingPhase": "PostEngineInit"
+      },
+      {
+        "Name": "ModularSystemsBase",
+        "Type": "Runtime",
+        "Enabled": true,
+        "LoadingPhase": "PostEngineInit"
+      },
+		{
+			"Name": "ChaosModularVehicle",
+			"Type": "Runtime",
+			"Enabled": true,
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystem",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemUtils",
+			"Enabled": true
+		}
+	],
+	"Dependencies": [
+		{
+			"Name": "ChaosModularVehicle"
+		},
+        {
+          "Name": "Windwalker_Productions_SharedDefaults"
+        },
+        {
+          "Name": "ModularSystemsBase"
+        },
+		{
+			"Name": "ModularInventorySystem"
+		},
+		{
+			"Name": "ModularInteractionSystem"
+		},
+		{
+			"Name": "ModularCheatManager"
+		},
+		
+      {
+        "Name": "ModularSaveGameSystem"
+      },
+      {
+        "Name": "ModularSpawnSystem"
+      }
+	]
+}

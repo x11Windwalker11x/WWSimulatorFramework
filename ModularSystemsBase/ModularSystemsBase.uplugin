@@ -1,0 +1,29 @@
+﻿{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "ModularSystemsBase",
+	"Description": "Modular Systems Base contains base modula and shared logic for Domain Plugins: ModularInteractionSystem, Modular InventorySystem, AdvancedWidgetFramework, SimulatorFramework, ModularQuestSystem, ModularPlayerController",
+	"Category": "Core",
+	"CreatedBy": "Windwalker Productions",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ModularSystemsBase",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+  "Plugins": [
+    {
+      "Name": "Windwalker_Productions_SharedDefaults",
+      "Enabled": true
+    }
+  ]
+}

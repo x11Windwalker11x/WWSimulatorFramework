@@ -1,0 +1,34 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "Modular Spawn System",
+	"Description": "Universal spawn management system for pickups, AI, props, and all world actors. Provides pooling, cleanup, and lifecycle management.",
+	"Category": "Windwalker Productions",
+	"CreatedBy": "Windwalker Productions",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ModularSpawnSystem",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Windwalker_Productions_SharedDefaults",
+			"Enabled": true
+		},
+      {
+        "Name": "ModularSystemsBase",
+        "Enabled": true
+      }
+	]
+}
