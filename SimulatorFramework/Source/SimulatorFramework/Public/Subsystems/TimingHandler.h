@@ -70,6 +70,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "MiniGame|Timing")
     float GetLastAccuracy() const { return LastAccuracy; }
 
+    /** Get max misses allowed (0 = unlimited) */
+    UFUNCTION(BlueprintPure, Category = "MiniGame|Timing")
+    int32 GetMaxMissesAllowed() const { return RhythmConfig.MaxMissesAllowed; }
+
     // === EVENTS ===
 
     UPROPERTY(BlueprintAssignable, Category = "MiniGame|Timing")
