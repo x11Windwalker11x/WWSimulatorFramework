@@ -457,6 +457,22 @@ public:
 	static const FGameplayTag& Simulator_MiniGame_Objective_TemperatureMaintained();
 	static const FGameplayTag& Simulator_MiniGame_Objective_CalibrationHeld();
 	static const FGameplayTag& Simulator_MiniGame_Objective_TimingHit();
+
+	// --- MiniGame IDs ---
+	static const FGameplayTag& Simulator_MiniGame_ID_Sequence_VaultNumpad();
+	static const FGameplayTag& Simulator_MiniGame_ID_Sequence_Keypad();
+	static const FGameplayTag& Simulator_MiniGame_ID_Lockpick_Standard();
+	static const FGameplayTag& Simulator_MiniGame_ID_Lockpick_Advanced();
+	static const FGameplayTag& Simulator_MiniGame_ID_Lockpick_Master();
+	static const FGameplayTag& Simulator_MiniGame_ID_Assembly_CarEngine();
+	static const FGameplayTag& Simulator_MiniGame_ID_Assembly_Weapon();
+	static const FGameplayTag& Simulator_MiniGame_ID_Temperature_CookingSteak();
+	static const FGameplayTag& Simulator_MiniGame_ID_Temperature_Smithing();
+	static const FGameplayTag& Simulator_MiniGame_ID_Timing_SafeDial();
+	static const FGameplayTag& Simulator_MiniGame_ID_Timing_Tumbler();
+	static const FGameplayTag& Simulator_MiniGame_ID_Calibration_Scope();
+	static const FGameplayTag& Simulator_MiniGame_ID_Calibration_Radio();
+
 	// --- Input: Numpad ---
 	static const FGameplayTag& Input_Numpad_0();
 	static const FGameplayTag& Input_Numpad_1();

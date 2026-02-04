@@ -124,15 +124,15 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_MainHand, "Inventory.Slot.MainHand");
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_OffHand, "Inventory.Slot.OffHand");
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_0, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_1, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_2, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_3, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_4, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_5, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_6, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_7, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_8, "Inventory.Slot.QuickSlot.0");
-    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_9, "Inventory.Slot.QuickSlot.0");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_1, "Inventory.Slot.QuickSlot.1");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_2, "Inventory.Slot.QuickSlot.2");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_3, "Inventory.Slot.QuickSlot.3");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_4, "Inventory.Slot.QuickSlot.4");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_5, "Inventory.Slot.QuickSlot.5");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_6, "Inventory.Slot.QuickSlot.6");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_7, "Inventory.Slot.QuickSlot.7");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_8, "Inventory.Slot.QuickSlot.8");
+    UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_QuickSlot_9, "Inventory.Slot.QuickSlot.9");
 	//Wearables
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_Wearable, "Inventory.Slot.Wearable");
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Slot_Wearable_Head, "Inventory.Slot.Wearable.Head");
@@ -240,6 +240,22 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_Objective_TemperatureMaintained, "Simulator.MiniGame.Objective.TemperatureMaintained");
     UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_Objective_CalibrationHeld, "Simulator.MiniGame.Objective.CalibrationHeld");
     UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_Objective_TimingHit, "Simulator.MiniGame.Objective.TimingHit");
+
+    // SIMULATOR FRAMEWORK MiniGame IDs
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Sequence_VaultNumpad, "Simulator.MiniGame.ID.Sequence.VaultNumpad");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Sequence_Keypad, "Simulator.MiniGame.ID.Sequence.Keypad");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Lockpick_Standard, "Simulator.MiniGame.ID.Lockpick.Standard");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Lockpick_Advanced, "Simulator.MiniGame.ID.Lockpick.Advanced");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Lockpick_Master, "Simulator.MiniGame.ID.Lockpick.Master");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Assembly_CarEngine, "Simulator.MiniGame.ID.Assembly.CarEngine");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Assembly_Weapon, "Simulator.MiniGame.ID.Assembly.Weapon");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Temperature_CookingSteak, "Simulator.MiniGame.ID.Temperature.CookingSteak");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Temperature_Smithing, "Simulator.MiniGame.ID.Temperature.Smithing");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Timing_SafeDial, "Simulator.MiniGame.ID.Timing.SafeDial");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Timing_Tumbler, "Simulator.MiniGame.ID.Timing.Tumbler");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Calibration_Scope, "Simulator.MiniGame.ID.Calibration.Scope");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_MiniGame_ID_Calibration_Radio, "Simulator.MiniGame.ID.Calibration.Radio");
+
     // SIMULATOR FRAMEWORK Input: Numpad
     UE_DEFINE_GAMEPLAY_TAG(Input_Numpad_0, "Input.Numpad.0");
     UE_DEFINE_GAMEPLAY_TAG(Input_Numpad_1, "Input.Numpad.1");
@@ -1085,6 +1101,21 @@ const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_Objective_SequenceComplete
 const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_Objective_TemperatureMaintained() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_Objective_TemperatureMaintained; return Tag; }
 const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_Objective_CalibrationHeld() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_Objective_CalibrationHeld; return Tag; }
 const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_Objective_TimingHit() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_Objective_TimingHit; return Tag; }
+
+// MiniGame IDs
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Sequence_VaultNumpad() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Sequence_VaultNumpad; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Sequence_Keypad() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Sequence_Keypad; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Lockpick_Standard() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Lockpick_Standard; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Lockpick_Advanced() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Lockpick_Advanced; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Lockpick_Master() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Lockpick_Master; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Assembly_CarEngine() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Assembly_CarEngine; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Assembly_Weapon() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Assembly_Weapon; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Temperature_CookingSteak() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Temperature_CookingSteak; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Temperature_Smithing() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Temperature_Smithing; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Timing_SafeDial() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Timing_SafeDial; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Timing_Tumbler() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Timing_Tumbler; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Calibration_Scope() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Calibration_Scope; return Tag; }
+const FGameplayTag& FWWTagLibrary::Simulator_MiniGame_ID_Calibration_Radio() { static const FGameplayTag& Tag = WW_Internal::Simulator_MiniGame_ID_Calibration_Radio; return Tag; }
 
 // Input: Numpad
 UE_DEFINE_GAMEPLAY_TAG(Simulator_Input_Numpad_0, "Input.Numpad.0");
