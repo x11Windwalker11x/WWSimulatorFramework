@@ -301,15 +301,21 @@ void UInventorySlotWidget::SetSelected(bool bSelected)
 void UInventorySlotWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
     Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
-    
+
     bIsHovered = true;
-    
+
+    // Notify WidgetManager of hover state
+    if (UWidgetManager* WidgetMgr = UWidgetManager::Get(GetOwningPlayer()))
+    {
+        WidgetMgr->SetHoveredSlot(InventoryType, SlotIndex);
+    }
+
     if (bEnableHoverHighlight)
     {
         // PRIORITY: Hover is ALWAYS brightest (overrides everything)
         SetHighlight(true, HoverHighlightColor);
-        
-        UE_LOG(LogInventoryInteractableSystem, Verbose, 
+
+        UE_LOG(LogInventoryInteractableSystem, Verbose,
             TEXT("🔶 Mouse entered Slot %d - Hover highlight"), SlotIndex);
     }
 }
@@ -317,9 +323,15 @@ void UInventorySlotWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const
 void UInventorySlotWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
     Super::NativeOnMouseLeave(InMouseEvent);
-    
+
     bIsHovered = false;
-    
+
+    // Notify WidgetManager hover cleared
+    if (UWidgetManager* WidgetMgr = UWidgetManager::Get(GetOwningPlayer()))
+    {
+        WidgetMgr->ClearHoveredSlot();
+    }
+
     // When mouse leaves, restore the appropriate state
     PC = GetOwningPlayer();
     if (!PC)

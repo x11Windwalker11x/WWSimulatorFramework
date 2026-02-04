@@ -50,7 +50,16 @@ public:
     /** Hide a widget */
     UFUNCTION(BlueprintCallable, Category = "Widget Manager")
     void HideWidget(UUserWidget* Widget);
-    
+
+    /**
+     * Show a widget at the current mouse cursor position
+     * @param WidgetClass - The widget class to create and show
+     * @param Offset - Optional offset from cursor position (default: zero)
+     * @return The created widget, or nullptr if failed
+     */
+    UFUNCTION(BlueprintCallable, Category = "Widget Manager")
+    UUserWidget* ShowWidgetAtCursor(TSubclassOf<UUserWidget> WidgetClass, FVector2D Offset = FVector2D::ZeroVector);
+
     /** Close active context menu */
     UFUNCTION(BlueprintCallable, Category = "Widget Manager")
     void CloseActiveContextMenu();
@@ -170,13 +179,70 @@ public:
     bool CanSlotAcceptAttachment(FGameplayTag InventoryType, int32 SlotIndex) const;
     
     // ============================================================================
+    // COMPARE MODE
+    // ============================================================================
+
+    /**
+     * Enter compare mode - compare items against a source item
+     * @param InventoryType - The inventory containing the source item
+     * @param SlotIndex - The slot of the item to compare against
+     */
+    UFUNCTION(BlueprintCallable, Category = "Widget Manager|Inventory")
+    void EnterCompareMode(FGameplayTag InventoryType, int32 SlotIndex);
+
+    /**
+     * Exit compare mode
+     */
+    UFUNCTION(BlueprintCallable, Category = "Widget Manager|Inventory")
+    void ExitCompareMode();
+
+    /**
+     * Check if currently in compare mode
+     */
+    UFUNCTION(BlueprintPure, Category = "Widget Manager|Inventory")
+    bool IsInCompareMode() const { return bIsInCompareMode; }
+
+    /**
+     * Get the source slot for comparison
+     * @param OutInventoryType - The inventory type of the compare source
+     * @param OutSlotIndex - The slot index of the compare source
+     */
+    UFUNCTION(BlueprintPure, Category = "Widget Manager|Inventory")
+    void GetCompareSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const;
+
+    // ============================================================================
+    // HOVER TRACKING
+    // ============================================================================
+
+    /**
+     * Get the currently hovered inventory slot
+     * @param OutInventoryType - The inventory type of the hovered slot
+     * @param OutSlotIndex - The slot index of the hovered slot
+     * @return True if a slot is currently hovered
+     */
+    UFUNCTION(BlueprintPure, Category = "Widget Manager|Hover")
+    bool GetHoveredInventorySlot(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const;
+
+    /**
+     * Set the currently hovered slot (called by InventorySlotWidget)
+     * @param InventoryType - The inventory type being hovered
+     * @param SlotIndex - The slot index being hovered
+     */
+    void SetHoveredSlot(FGameplayTag InventoryType, int32 SlotIndex);
+
+    /**
+     * Clear the hovered slot (called by InventorySlotWidget on mouse leave)
+     */
+    void ClearHoveredSlot();
+
+    // ============================================================================
     // DELEGATES
     // ============================================================================
-    
+
     /** Broadcast when selection mode changes (combine/attachment mode entered/exited) */
     UPROPERTY(BlueprintAssignable, Category = "Widget Manager|Events")
     FOnSelectionModeChanged OnSelectionModeChanged;
-    
+
     /** Broadcast when slot selection changes */
     UPROPERTY(BlueprintAssignable, Category = "Widget Manager|Events")
     FOnSelectionChanged OnSelectionChanged;
@@ -219,10 +285,33 @@ private:
     
     /** Are we in attachment mode? */
     bool bIsInAttachmentMode = false;
-    
+
     /** Source inventory for attachment */
     FGameplayTag AttachmentSourceInventory;
-    
+
     /** Source slot for attachment */
     int32 AttachmentSourceSlot = -1;
+
+    // ----------------------------------------------------------------------------
+    // COMPARE MODE STATE
+    // ----------------------------------------------------------------------------
+
+    /** Are we in compare mode? */
+    bool bIsInCompareMode = false;
+
+    /** Source inventory for compare */
+    FGameplayTag CompareSourceInventory;
+
+    /** Source slot for compare */
+    int32 CompareSourceSlot = INDEX_NONE;
+
+    // ----------------------------------------------------------------------------
+    // HOVER TRACKING STATE
+    // ----------------------------------------------------------------------------
+
+    /** Currently hovered slot */
+    FInventorySlotReference HoveredSlot;
+
+    /** Is there a currently hovered slot? */
+    bool bHasHoveredSlot = false;
 };

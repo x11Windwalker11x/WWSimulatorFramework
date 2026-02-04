@@ -25,7 +25,8 @@ void UWidgetManager::Deinitialize()
     ClearSelection();
     ExitQuestCombineMode();
     ExitAttachmentMode();
-    
+    ExitCompareMode();
+
     Super::Deinitialize();
 }
 
@@ -72,6 +73,28 @@ void UWidgetManager::HideWidget(UUserWidget* Widget)
     {
         Widget->RemoveFromParent();
     }
+}
+
+UUserWidget* UWidgetManager::ShowWidgetAtCursor(TSubclassOf<UUserWidget> WidgetClass, FVector2D Offset)
+{
+    APlayerController* PC = GetOwningPlayer();
+    if (!PC || !WidgetClass)
+    {
+        return nullptr;
+    }
+
+    // Create widget with high Z-order (above most UI)
+    UUserWidget* Widget = ShowWidget(WidgetClass, 100);
+    if (Widget)
+    {
+        float MouseX, MouseY;
+        if (PC->GetMousePosition(MouseX, MouseY))
+        {
+            Widget->SetPositionInViewport(FVector2D(MouseX, MouseY) + Offset, false);
+        }
+    }
+
+    return Widget;
 }
 
 void UWidgetManager::CloseActiveContextMenu()
@@ -271,6 +294,86 @@ bool UWidgetManager::CanSlotAcceptAttachment(FGameplayTag InventoryType, int32 S
         AttachmentSourceInventory, AttachmentSourceSlot,
         InventoryType, SlotIndex
     );
+}
+
+// ============================================================================
+// COMPARE MODE
+// ============================================================================
+
+void UWidgetManager::EnterCompareMode(FGameplayTag InventoryType, int32 SlotIndex)
+{
+    // Exit other modes if active
+    if (bIsInQuestCombineMode)
+    {
+        ExitQuestCombineMode();
+    }
+    if (bIsInAttachmentMode)
+    {
+        ExitAttachmentMode();
+    }
+
+    bIsInCompareMode = true;
+    CompareSourceInventory = InventoryType;
+    CompareSourceSlot = SlotIndex;
+
+    UE_LOG(LogInventoryInteractableSystem, Log,
+        TEXT("📊 Entered Compare Mode - Source: %s, Slot: %d"),
+        *InventoryType.ToString(), SlotIndex);
+
+    OnSelectionModeChanged.Broadcast();
+}
+
+void UWidgetManager::ExitCompareMode()
+{
+    if (!bIsInCompareMode)
+    {
+        return;
+    }
+
+    bIsInCompareMode = false;
+    CompareSourceInventory = FGameplayTag();
+    CompareSourceSlot = INDEX_NONE;
+
+    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("📊 Exited Compare Mode"));
+
+    OnSelectionModeChanged.Broadcast();
+}
+
+void UWidgetManager::GetCompareSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
+{
+    OutInventoryType = CompareSourceInventory;
+    OutSlotIndex = CompareSourceSlot;
+}
+
+// ============================================================================
+// HOVER TRACKING
+// ============================================================================
+
+bool UWidgetManager::GetHoveredInventorySlot(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
+{
+    if (bHasHoveredSlot)
+    {
+        OutInventoryType = HoveredSlot.InventoryType;
+        OutSlotIndex = HoveredSlot.SlotIndex;
+        return true;
+    }
+
+    OutInventoryType = FGameplayTag();
+    OutSlotIndex = INDEX_NONE;
+    return false;
+}
+
+void UWidgetManager::SetHoveredSlot(FGameplayTag InventoryType, int32 SlotIndex)
+{
+    HoveredSlot.InventoryType = InventoryType;
+    HoveredSlot.SlotIndex = SlotIndex;
+    bHasHoveredSlot = true;
+}
+
+void UWidgetManager::ClearHoveredSlot()
+{
+    HoveredSlot = FInventorySlotReference();
+    bHasHoveredSlot = false;
 }
 
 // ============================================================================
