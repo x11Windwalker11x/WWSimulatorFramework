@@ -6,6 +6,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Border.h"
 #include "Components/MiniGameComponent.h"
+#include "Subsystems/SequenceHandler.h"
 #include "Lib/Data/Tags/WW_TagLibrary.h"
 #include "TimerManager.h"
 
@@ -32,9 +33,9 @@ void UNumpadWidget::NativeConstruct()
 // MINIGAME HUD OVERRIDES
 // ============================================================================
 
-void UNumpadWidget::OnMiniGameStarted_Implementation()
+void UNumpadWidget::OnMiniGameStarted_Implementation(const FGameplayTag& MiniGameID, UMiniGameHandlerBase* Handler)
 {
-    Super::OnMiniGameStarted_Implementation();
+    Super::OnMiniGameStarted_Implementation(MiniGameID, Handler);
 
     // Reset display
     UpdateCodeDisplay();
@@ -50,9 +51,9 @@ void UNumpadWidget::OnMiniGameStarted_Implementation()
     }
 }
 
-void UNumpadWidget::OnMiniGameEnded_Implementation(bool bSuccess)
+void UNumpadWidget::OnMiniGameEnded_Implementation(const FGameplayTag& MiniGameID, bool bSuccess, bool bBonus)
 {
-    Super::OnMiniGameEnded_Implementation(bSuccess);
+    Super::OnMiniGameEnded_Implementation(MiniGameID, bSuccess, bBonus);
 
     // Final feedback
     if (Border_Feedback)
@@ -67,21 +68,27 @@ void UNumpadWidget::OnMiniGameEnded_Implementation(bool bSuccess)
     }
 }
 
-void UNumpadWidget::OnProgressUpdated_Implementation(float Progress, int32 CurrentStep, int32 TotalSteps)
+void UNumpadWidget::OnProgressUpdated_Implementation(const FGameplayTag& ObjectiveTag, float Progress)
 {
-    Super::OnProgressUpdated_Implementation(Progress, CurrentStep, TotalSteps);
+    Super::OnProgressUpdated_Implementation(ObjectiveTag, Progress);
+
+    // Query state from SequenceHandler (same-plugin Cast per Rule #30)
+    USequenceHandler* SeqHandler = Cast<USequenceHandler>(CachedHandler.Get());
 
     UpdateCodeDisplay();
 
     // Update error count
-    if (Text_ErrorCount)
+    if (Text_ErrorCount && SeqHandler)
     {
-        int32 Errors = GetErrorCount();
+        int32 Errors = SeqHandler->GetErrorCount();
         Text_ErrorCount->SetText(FText::FromString(FString::Printf(TEXT("Errors: %d"), Errors)));
     }
 
     // Show feedback based on last input
-    ShowFeedback(WasLastInputCorrect());
+    if (SeqHandler)
+    {
+        ShowFeedback(SeqHandler->WasLastInputCorrect());
+    }
 }
 
 // ============================================================================
@@ -160,7 +167,13 @@ void UNumpadWidget::UpdateCodeDisplay()
         return;
     }
 
-    TArray<FGameplayTag> CurrentSequence = GetCurrentSequence();
+    // Query sequence from SequenceHandler (same-plugin Cast per Rule #30)
+    USequenceHandler* SeqHandler = Cast<USequenceHandler>(CachedHandler.Get());
+    TArray<FGameplayTag> CurrentSequence;
+    if (SeqHandler)
+    {
+        CurrentSequence = SeqHandler->GetCurrentSequence();
+    }
     FString DisplayStr;
 
     if (bShowDigits)

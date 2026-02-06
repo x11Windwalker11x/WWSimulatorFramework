@@ -31,9 +31,9 @@ protected:
     // MINIGAME HUD OVERRIDES
     // ============================================================================
 
-    virtual void OnMiniGameStarted_Implementation() override;
-    virtual void OnMiniGameEnded_Implementation(bool bSuccess) override;
-    virtual void OnProgressUpdated_Implementation(float Progress, int32 CurrentStep, int32 TotalSteps) override;
+    virtual void OnMiniGameStarted_Implementation(const FGameplayTag& MiniGameID, UMiniGameHandlerBase* Handler) override;
+    virtual void OnMiniGameEnded_Implementation(const FGameplayTag& MiniGameID, bool bSuccess, bool bBonus) override;
+    virtual void OnProgressUpdated_Implementation(const FGameplayTag& ObjectiveTag, float Progress) override;
 
     // ============================================================================
     // BOUND WIDGETS - TIMING BAR

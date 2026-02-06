@@ -306,6 +306,16 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Debug_Pawn, "Debug.Pawn");
     UE_DEFINE_GAMEPLAY_TAG(Debug_SaveSystem, "Debug.SaveSystem");
     UE_DEFINE_GAMEPLAY_TAG(Debug_Widget, "Debug.Widget");
+
+    // UI WIDGET STATE MACHINE STATES
+    UE_DEFINE_GAMEPLAY_TAG(UI_Widget_State_Closed, "UI.Widget.State.Closed");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Widget_State_AnimatingIn, "UI.Widget.State.AnimatingIn");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Widget_State_Visible, "UI.Widget.State.Visible");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Widget_State_Paused, "UI.Widget.State.Paused");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Widget_State_AnimatingOut, "UI.Widget.State.AnimatingOut");
+
+    // UI DOCK ZONE TAGS
+    UE_DEFINE_GAMEPLAY_TAG(UI_Dock_Zone, "UI.Dock.Zone");
 }
 
 // Implement public accessor functions
@@ -1491,8 +1501,45 @@ FGameplayTag FWWTagLibrary::UI_Widget_Category_PauseMenu()
 
 FGameplayTag FWWTagLibrary::UI_Widget_Category_HUD()
 {
-    return FGameplayTag::RequestGameplayTag(FName("UI.Widget.Category.HUD")); 
+    return FGameplayTag::RequestGameplayTag(FName("UI.Widget.Category.HUD"));
 
 }
 
+// UI WIDGET STATE MACHINE STATES
 
+const FGameplayTag& FWWTagLibrary::UI_Widget_State_Closed()
+{
+    static const FGameplayTag& Tag = WW_Internal::UI_Widget_State_Closed;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::UI_Widget_State_AnimatingIn()
+{
+    static const FGameplayTag& Tag = WW_Internal::UI_Widget_State_AnimatingIn;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::UI_Widget_State_Visible()
+{
+    static const FGameplayTag& Tag = WW_Internal::UI_Widget_State_Visible;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::UI_Widget_State_Paused()
+{
+    static const FGameplayTag& Tag = WW_Internal::UI_Widget_State_Paused;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::UI_Widget_State_AnimatingOut()
+{
+    static const FGameplayTag& Tag = WW_Internal::UI_Widget_State_AnimatingOut;
+    return Tag;
+}
+
+// UI DOCK ZONE TAGS
+const FGameplayTag& FWWTagLibrary::UI_Dock_Zone()
+{
+    static const FGameplayTag& Tag = WW_Internal::UI_Dock_Zone;
+    return Tag;
+}

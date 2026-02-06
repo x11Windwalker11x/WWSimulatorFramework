@@ -540,8 +540,34 @@ public:
 
     /** HUD elements (health, stamina) - Priority: 0 (never closes) */
     UFUNCTION(BlueprintPure, Category = "Tags|UI|Widget")
-    static FGameplayTag UI_Widget_Category_HUD(); 
-    
+    static FGameplayTag UI_Widget_Category_HUD();
+
+    // ============================================================================
+    // UI - WIDGET STATE MACHINE STATES
+    // ============================================================================
+
+    /** Widget is not visible, not in viewport */
+    static const FGameplayTag& UI_Widget_State_Closed();
+
+    /** Widget is transitioning to visible (animate-in) */
+    static const FGameplayTag& UI_Widget_State_AnimatingIn();
+
+    /** Widget is fully visible and interactive */
+    static const FGameplayTag& UI_Widget_State_Visible();
+
+    /** Widget is hidden by higher-priority widget, will resume */
+    static const FGameplayTag& UI_Widget_State_Paused();
+
+    /** Widget is transitioning to closed (animate-out) */
+    static const FGameplayTag& UI_Widget_State_AnimatingOut();
+
+    // ============================================================================
+    // UI - DOCK ZONE TAGS (parent hierarchy for user-defined zones)
+    // ============================================================================
+
+    /** UI.Dock.Zone - Parent tag for all dock zones */
+    static const FGameplayTag& UI_Dock_Zone();
+
 // ============================================================================
 // UI - INVENTORY SORT TAGS
 // ============================================================================

@@ -40,9 +40,20 @@ UUserWidget* UWidgetManagerBase::ShowWidget(TSubclassOf<UUserWidget> WidgetClass
     UUserWidget* Widget = CreateWidget<UUserWidget>(PC, WidgetClass);
     if (Widget)
     {
-        Widget->AddToViewport(ZOrder);
-        ActiveWidgets.Add(WidgetClass, Widget);
-        OnWidgetShown.Broadcast(Widget);
+        // Check if state manager intercepts the show transition
+        if (OnWidgetTransitionRequested.IsBound() && OnWidgetTransitionRequested.Execute(Widget, true))
+        {
+            // Intercepted - state manager handles visibility/animation
+            // Still track the widget for lifecycle management
+            ActiveWidgets.Add(WidgetClass, Widget);
+        }
+        else
+        {
+            // No interceptor or not handled - immediate show
+            Widget->AddToViewport(ZOrder);
+            ActiveWidgets.Add(WidgetClass, Widget);
+            OnWidgetShown.Broadcast(Widget);
+        }
     }
 
     return Widget;
@@ -68,12 +79,22 @@ void UWidgetManagerBase::HideWidget(UUserWidget* Widget, bool bDestroy)
         ActiveWidgets.Remove(FoundClass);
     }
 
-    Widget->RemoveFromParent();
-    OnWidgetHidden.Broadcast(Widget);
-
-    if (bDestroy)
+    // Check if state manager intercepts the hide transition
+    if (OnWidgetTransitionRequested.IsBound() && OnWidgetTransitionRequested.Execute(Widget, false))
     {
-        Widget->ConditionalBeginDestroy();
+        // Intercepted - state manager handles animate-out, then removes
+        // bDestroy is handled by the state manager after animation completes
+    }
+    else
+    {
+        // No interceptor - immediate hide
+        Widget->RemoveFromParent();
+        OnWidgetHidden.Broadcast(Widget);
+
+        if (bDestroy)
+        {
+            Widget->ConditionalBeginDestroy();
+        }
     }
 }
 

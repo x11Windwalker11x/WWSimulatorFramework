@@ -61,9 +61,9 @@ void UTimingWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 // MINIGAME HUD OVERRIDES
 // ============================================================================
 
-void UTimingWidget::OnMiniGameStarted_Implementation()
+void UTimingWidget::OnMiniGameStarted_Implementation(const FGameplayTag& MiniGameID, UMiniGameHandlerBase* Handler)
 {
-    Super::OnMiniGameStarted_Implementation();
+    Super::OnMiniGameStarted_Implementation(MiniGameID, Handler);
 
     // Cache timing handler
     if (CachedHandler.IsValid())
@@ -96,9 +96,9 @@ void UTimingWidget::OnMiniGameStarted_Implementation()
     }
 }
 
-void UTimingWidget::OnMiniGameEnded_Implementation(bool bSuccess)
+void UTimingWidget::OnMiniGameEnded_Implementation(const FGameplayTag& MiniGameID, bool bSuccess, bool bBonus)
 {
-    Super::OnMiniGameEnded_Implementation(bSuccess);
+    Super::OnMiniGameEnded_Implementation(MiniGameID, bSuccess, bBonus);
 
     // Final feedback
     if (Border_Feedback)
@@ -113,9 +113,9 @@ void UTimingWidget::OnMiniGameEnded_Implementation(bool bSuccess)
     }
 }
 
-void UTimingWidget::OnProgressUpdated_Implementation(float Progress, int32 CurrentStep, int32 TotalSteps)
+void UTimingWidget::OnProgressUpdated_Implementation(const FGameplayTag& ObjectiveTag, float Progress)
 {
-    Super::OnProgressUpdated_Implementation(Progress, CurrentStep, TotalSteps);
+    Super::OnProgressUpdated_Implementation(ObjectiveTag, Progress);
 
     if (!CachedTimingHandler.IsValid())
     {

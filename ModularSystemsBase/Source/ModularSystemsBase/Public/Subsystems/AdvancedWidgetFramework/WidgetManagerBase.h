@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "GameplayTagContainer.h"
+#include "Delegates/AdvancedWidgetFramework/WW_WidgetDelegates.h"
 #include "WidgetManagerBase.generated.h"
 
 class UUserWidget;
@@ -112,6 +113,36 @@ public:
 
     UPROPERTY(BlueprintAssignable, Category = "Widget Manager|Events")
     FOnWidgetHidden OnWidgetHidden;
+
+    /**
+     * Transition intercept delegate (single-cast).
+     * If bound, the interceptor (e.g. UWidgetStateManager) handles show/hide transitions.
+     * If not bound, default immediate show/hide (graceful degradation when AWF deleted).
+     * Return true = intercepted, false = proceed with default behavior.
+     */
+    FWidgetTransitionInterceptDelegate OnWidgetTransitionRequested;
+
+    /** Fired after any widget state change (for external listeners) */
+    UPROPERTY(BlueprintAssignable, Category = "Widget Manager|Events")
+    FOnWidgetStateChanged OnWidgetStateChanged;
+
+    /**
+     * Sync intercept delegate (single-cast).
+     * If bound, UWidgetSyncSubsystem captures state changes for replication.
+     * Fires alongside OnWidgetStateChanged for sync capture.
+     */
+    FWidgetSyncInterceptDelegate OnWidgetSyncRequested;
+
+    /**
+     * Dock intercept delegate (single-cast).
+     * If bound, UDockLayoutManager handles widget dock zone placement.
+     * Return true = intercepted, false = no docking behavior.
+     */
+    FWidgetDockInterceptDelegate OnWidgetDockRequested;
+
+    /** Fired when any dock/undock/rearrange occurs */
+    UPROPERTY(BlueprintAssignable, Category = "Widget Manager|Events")
+    FOnDockLayoutChanged OnDockLayoutChanged;
 
 protected:
     /** Get owning player controller */

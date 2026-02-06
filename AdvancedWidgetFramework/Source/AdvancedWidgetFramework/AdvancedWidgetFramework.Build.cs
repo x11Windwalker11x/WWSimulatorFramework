@@ -32,6 +32,7 @@ public class AdvancedWidgetFramework : ModuleRules
 				"Slate",
 				"SlateCore",
 				"GameplayTags",
+				"NetCore",
 				"Windwalker_Productions_SharedDefaults",
 				"ModularSystemsBase"
 				// ... add other public dependencies that you statically link with here ...
