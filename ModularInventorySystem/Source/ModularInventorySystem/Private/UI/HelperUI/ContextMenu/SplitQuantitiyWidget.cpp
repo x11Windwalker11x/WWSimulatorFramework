@@ -2,7 +2,7 @@
 #include "UI/HelperUI/ContextMenu/SplitQuantitiyWidget.h"
 #include "Windwalker_Productions_SharedDefaults.h"
 #include "Components/InventoryComponent.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 USplitQuantityWidget::USplitQuantityWidget(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)

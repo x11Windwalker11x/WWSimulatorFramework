@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/RootWidget.h"
 #include "MPC_GameMode.generated.h"
@@ -33,13 +33,13 @@ public:
     UDeveloperWhitelistAsset* DeveloperWhitelistAsset;
     
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player")
-    UWidgetManager* WidgetManager;
+    UInventoryWidgetManager* WidgetManager;
 protected:
     /**
      * Helper to register a widget pool with error logging
      */
     bool RegisterWidgetPool(
-    UWidgetManager* InWidgetManager, 
+    UInventoryWidgetManager* InWidgetManager, 
         const TCHAR* InWidgetPath,
         int32 InPoolSize,
         FName InPoolName,

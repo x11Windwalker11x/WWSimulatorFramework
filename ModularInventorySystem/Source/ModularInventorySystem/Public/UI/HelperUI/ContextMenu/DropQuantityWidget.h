@@ -7,7 +7,7 @@
 #include "Components/Slider.h"
 #include "GameplayTags.h"
 #include "MasterWidgets/ManagedWidget_Master.h"
-#include "Subsystems/WidgetManager.h" // Contains FInventorySlotReference
+#include "Subsystems/InventoryWidgetManager.h" // Contains FInventorySlotReference
 #include "DropQuantityWidget.generated.h"
 
 class UInventoryComponent;

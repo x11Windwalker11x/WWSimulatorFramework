@@ -9,7 +9,7 @@
 #include "InstanceCulling/InstanceCullingContext.h"
 #include "Windwalker_Productions_SharedDefaults/Public/WW_TagLibrary.h"
 #include "Logging/InteractableInventoryLogging.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 // ============================================================================
 // WIDGET LIFECYCLE
@@ -29,7 +29,7 @@ void UInventorySlotWidget::NativeConstruct()
     // Bind to WidgetManager selection changes
     if (APlayerController* PlayerController = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PlayerController))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PlayerController))
         {
             WidgetMgr->OnSelectionChanged.AddDynamic(this, &UInventorySlotWidget::OnSelectionChanged);
             
@@ -84,7 +84,7 @@ void UInventorySlotWidget::NativeDestruct()
     // *** NEW: Close any active context menu when slot widget is destroyed ***
     if (APlayerController* PlayerController = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PlayerController))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PlayerController))
         {
             WidgetMgr->CloseActiveContextMenu();
             
@@ -305,7 +305,7 @@ void UInventorySlotWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const
     bIsHovered = true;
 
     // Notify WidgetManager of hover state
-    if (UWidgetManager* WidgetMgr = UWidgetManager::Get(GetOwningPlayer()))
+    if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(GetOwningPlayer()))
     {
         WidgetMgr->SetHoveredSlot(InventoryType, SlotIndex);
     }
@@ -327,7 +327,7 @@ void UInventorySlotWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
     bIsHovered = false;
 
     // Notify WidgetManager hover cleared
-    if (UWidgetManager* WidgetMgr = UWidgetManager::Get(GetOwningPlayer()))
+    if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(GetOwningPlayer()))
     {
         WidgetMgr->ClearHoveredSlot();
     }
@@ -340,7 +340,7 @@ void UInventorySlotWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
         return;
     }
     
-    WidgetManager = UWidgetManager::Get(PC);
+    WidgetManager = UInventoryWidgetManager::Get(PC);
     if (!WidgetManager)
     {
         SetHighlight(false);
@@ -411,7 +411,7 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
         // Close context menu if open
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(GetOwningPlayer()))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(GetOwningPlayer()))
         {
             WidgetMgr->CloseActiveContextMenu();
         }
@@ -425,7 +425,7 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
             PC = GetOwningPlayer();
             if (!PC) return FReply::Handled();
             
-            WidgetManager = UWidgetManager::Get(PC);
+            WidgetManager = UInventoryWidgetManager::Get(PC);
             if (!WidgetManager) return FReply::Handled();
             
             // Only show context menu in inventory mode
@@ -444,7 +444,7 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
     if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton) && InMouseEvent.IsShiftDown())
     {
         PC = GetOwningPlayer();
-        WidgetManager = UWidgetManager::Get(PC);
+        WidgetManager = UInventoryWidgetManager::Get(PC);
         
         if (HasItem() && WidgetManager && WidgetManager->CanMultiSelect(InventoryType))
         {
@@ -463,7 +463,7 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
     if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
     {
         PC = GetOwningPlayer();
-        WidgetManager = UWidgetManager::Get(PC);
+        WidgetManager = UInventoryWidgetManager::Get(PC);
         
         // *** NEW: Close any open context menu on left-click ***
         if (WidgetManager)
@@ -1036,7 +1036,7 @@ void UInventorySlotWidget::OnSelectionChanged()
         return;
     }
     
-    WidgetManager = UWidgetManager::Get(PC);
+    WidgetManager = UInventoryWidgetManager::Get(PC);
     if (!WidgetManager)
     {
         return;
@@ -1127,7 +1127,7 @@ void UInventorySlotWidget::OpenContextMenu(const FPointerEvent& MouseEvent)
     }
     
     // Get WidgetManager to manage single menu instance
-    UWidgetManager* WidgetMgr = UWidgetManager::Get(PlayerController);
+    UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PlayerController);
     if (!WidgetMgr)
     {
         UE_LOG(LogInventoryInteractableSystem, Error, 

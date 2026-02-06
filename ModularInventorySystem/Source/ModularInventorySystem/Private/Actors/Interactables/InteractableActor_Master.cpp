@@ -6,6 +6,7 @@
 #include "Engine/AssetManager.h"
 #include "Interface/InteractionSystem/InteractorInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 // ============================================================================
 // CONSTRUCTOR
@@ -90,7 +91,7 @@ void AInteractableActor_Master::PostInitializeComponents()
 	InteractableInstigator = Cast<APlayerController>(InteractableComponent->InteractableInstigator);
 	if (InteractableInstigator)
 	{
-		UWidgetManager* WidgetManager = UWidgetManager::Get(InteractableInstigator);
+		UInventoryWidgetManager* WidgetManager = UInventoryWidgetManager::Get(InteractableInstigator);
 	}
 }
 
@@ -198,7 +199,7 @@ void AInteractableActor_Master::EndPlay(EEndPlayReason::Type EndPlayReason)
 				*GetName(), *InteractableInstigator->GetNetOwningPlayer()->GetName());
 			UE_LOG(LogTemp, Verbose, TEXT("%s"), *WarningText);
 			
-			UWidgetManager* WidgetManager = UWidgetManager::Get(InteractableInstigator);
+			UInventoryWidgetManager* WidgetManager = UInventoryWidgetManager::Get(InteractableInstigator);
 			
 			if (WidgetManager)
 			{

@@ -112,3 +112,69 @@ APlayerController* UWidgetManagerBase::GetOwningPlayer() const
 
     return LocalPlayer->GetPlayerController(GetWorld());
 }
+
+void UWidgetManagerBase::RegisterWidgetWithCategory(UUserWidget* Widget, FGameplayTag CategoryTag)
+{
+    if (!Widget || !CategoryTag.IsValid()) return;
+
+    TArray<TObjectPtr<UUserWidget>>& Widgets = CategoryWidgets.FindOrAdd(CategoryTag);
+    if (!Widgets.Contains(Widget))
+    {
+        Widgets.Add(Widget);
+    }
+}
+
+void UWidgetManagerBase::UnregisterWidgetFromStack(UUserWidget* Widget)
+{
+    if (!Widget) return;
+
+    // Remove from all categories
+    for (auto& Pair : CategoryWidgets)
+    {
+        Pair.Value.Remove(Widget);
+    }
+}
+
+TArray<UUserWidget*> UWidgetManagerBase::GetWidgetsByCategory(FGameplayTag CategoryTag) const
+{
+    TArray<UUserWidget*> Result;
+    if (const TArray<TObjectPtr<UUserWidget>>* Found = CategoryWidgets.Find(CategoryTag))
+    {
+        for (const TObjectPtr<UUserWidget>& Widget : *Found)
+        {
+            if (Widget)
+            {
+                Result.Add(Widget);
+            }
+        }
+    }
+    return Result;
+}
+
+bool UWidgetManagerBase::IsWidgetRegistered(TSubclassOf<UUserWidget> WidgetClass) const
+{
+    return RegisteredWidgetClasses.Contains(WidgetClass);
+}
+
+void UWidgetManagerBase::RegisterWidget(TSubclassOf<UUserWidget> WidgetClass, int32 PoolSize, int32 ZOrder, bool bAutoShow, bool bAllowMultiple)
+{
+    if (!WidgetClass) return;
+
+    RegisteredWidgetClasses.Add(WidgetClass);
+    WidgetZOrders.Add(WidgetClass, ZOrder);
+
+    if (bAutoShow)
+    {
+        ShowWidget(WidgetClass, ZOrder);
+    }
+}
+
+void UWidgetManagerBase::HideWidget(TSubclassOf<UUserWidget> WidgetClass)
+{
+    if (!WidgetClass) return;
+
+    if (UUserWidget* Widget = GetActiveWidget(WidgetClass))
+    {
+        HideWidget(Widget, false);
+    }
+}

@@ -3,7 +3,7 @@
 #include "Components/InteractableComponent.h"
 
 #include "Components/WidgetComponent.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/AdvancedWidgetFramework/WidgetManagerBase.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
@@ -149,7 +149,7 @@ void UInteractableComponent::BeginPlay()
    // Register the prompt widget with WidgetManager if configured
    if (InteractionPromptClass)
    {
-      UWidgetManager* WidgetManager = GetWidgetManager();
+      UWidgetManagerBase* WidgetManager = GetWidgetManager();
       if (WidgetManager)
       {
          // Register as pooled widget (PoolSize=1, not allowing multiple)
@@ -573,7 +573,7 @@ void UInteractableComponent::ShowPrompt()
        return;
     }
     
-    UWidgetManager* WidgetManager = GetWidgetManager();
+    UWidgetManagerBase* WidgetManager = GetWidgetManager();
     if (!WidgetManager)
     {
        FString Message = FString::Printf(TEXT("InteractableComponent: %s - No WidgetManager found!"), *GetOwner()->GetName());
@@ -602,7 +602,7 @@ void UInteractableComponent::HidePrompt()
        return;
     }
     
-    UWidgetManager* WidgetManager = GetWidgetManager();
+    UWidgetManagerBase* WidgetManager = GetWidgetManager();
     if (!WidgetManager)
     {
        return;
@@ -658,7 +658,7 @@ void UInteractableComponent::UpdatePromptText(const FText& NewText)
 // HELPERS
 // ============================================================================
 
-UWidgetManager* UInteractableComponent::GetWidgetManager() const
+UWidgetManagerBase* UInteractableComponent::GetWidgetManager() const
 {
     // Return cached if available
     if (CachedWidgetManager)
@@ -695,7 +695,7 @@ UWidgetManager* UInteractableComponent::GetWidgetManager() const
     
     // Cache it for future use
     UInteractableComponent* MutableThis = const_cast<UInteractableComponent*>(this);
-    MutableThis->CachedWidgetManager = LocalPlayer->GetSubsystem<UWidgetManager>();
+    MutableThis->CachedWidgetManager = LocalPlayer->GetSubsystem<UWidgetManagerBase>();
     
     return CachedWidgetManager;
 }

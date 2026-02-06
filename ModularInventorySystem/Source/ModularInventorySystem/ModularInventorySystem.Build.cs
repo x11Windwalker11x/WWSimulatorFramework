@@ -35,7 +35,6 @@ public class ModularInventorySystem : ModuleRules
 				"Windwalker_Productions_SharedDefaults",
 				"ModularSystemsBase",
 				"ModularSpawnSystem",
-				"AdvancedWidgetFramework",
 				"ModularInteractionSystem",
 				"Projects",
 				"GameplayTags",

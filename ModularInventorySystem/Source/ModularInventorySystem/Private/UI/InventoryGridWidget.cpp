@@ -6,6 +6,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Logging/InteractableInventoryLogging.h"
 #include "Windwalker_Productions_SharedDefaults/Public/WW_TagLibrary.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 // ============================================================================
 // WIDGET LIFECYCLE
@@ -347,7 +348,7 @@ FReply UInventoryGridWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
         // Close context menu
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(GetOwningPlayer()))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(GetOwningPlayer()))
         {
             WidgetMgr->CloseActiveContextMenu();
         }
@@ -538,7 +539,7 @@ void UInventoryGridWidget::EndBoxSelection()
     // Select all slots
     if (APlayerController* PC = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PC))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PC))
         {
             // Clear previous selection
             WidgetMgr->ClearSelection();

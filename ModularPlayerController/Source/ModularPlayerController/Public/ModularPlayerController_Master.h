@@ -21,7 +21,7 @@
 #include "GenericPlatform/GenericPlatformMisc.h"
 #include "Misc/SecureHash.h"
 #include "GameplayTagContainer.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "WW_TagLibrary.h"
 #include "Input/InputSettingsDataAsset.h"
 #include "Camera/Manager/MPC_PlayerCameraManager.h"

@@ -11,7 +11,7 @@
 #include "Components/CanvasPanel.h"
 #include "MasterWidgets/ManagedWidget_Master.h"
 #include "Components/InventoryComponent.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 #include "InventoryGridWidget.generated.h"
 

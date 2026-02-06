@@ -11,6 +11,7 @@
 #include "Pawns/MPC_Character_Master.h"
 #include "Pawns/MPC_Pawn_Master.h"
 #include "Pawns/Vehicles/MPC_Vehicle_Master.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 AModularPlayerController_Master::AModularPlayerController_Master()
 {
@@ -684,7 +685,7 @@ void AModularPlayerController_Master::OnESC_ContextAction()
 {
     if (IsLocalPlayerController())
     {
-        if (UWidgetManager* WidgetManager = UWidgetManager::Get(this))
+        if (UInventoryWidgetManager* WidgetManager = UInventoryWidgetManager::Get(this))
         {
             if (WidgetManager->ActiveContextMenu)
             {
@@ -923,7 +924,7 @@ void AModularPlayerController_Master::ProcessPlayerInput(const float DeltaTime, 
     // Check if left mouse button was just pressed
     if (WasInputKeyJustPressed(EKeys::LeftMouseButton))
     {
-        if (UWidgetManager* WidgetManager = UWidgetManager::Get(this))
+        if (UInventoryWidgetManager* WidgetManager = UInventoryWidgetManager::Get(this))
         {
             if (UUserWidget* ActiveMenu = WidgetManager->GetActiveContextMenu())
             {

@@ -20,6 +20,7 @@
 
 // Forward declarations
 class UInventorySlotDragDropOperation;
+class UInventoryWidgetManager;
 
 /**
  * Single Inventory Slot Widget
@@ -407,7 +408,7 @@ protected:
     bool bIsSelected = false;
 
     UPROPERTY(Transient)
-    UWidgetManager* WidgetManager;
+    UInventoryWidgetManager* WidgetManager;
     UPROPERTY(Transient)
     APlayerController* PC;
     

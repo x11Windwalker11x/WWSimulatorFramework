@@ -5,7 +5,7 @@
 #include "DeveloperWhitelistAsset.h"
 #include "ModularPlayerController_Master.h"
 #include "InteractionSystem/InteractionDefaultsConstants.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 AMPC_GameMode::AMPC_GameMode()
 {
@@ -24,7 +24,7 @@ void AMPC_GameMode::BeginPlay()
         APlayerController* PC = It->Get();
         if (PC && PC->IsLocalController())
         {
-            WidgetManager = UWidgetManager::Get(PC);
+            WidgetManager = UInventoryWidgetManager::Get(PC);
             CreateRootWidget(bUseDragAndDropOps);
         }
     }
@@ -53,7 +53,7 @@ void AMPC_GameMode::BeginPlay()
 }
 
 bool AMPC_GameMode::RegisterWidgetPool(
-    UWidgetManager* InWidgetManager,
+    UInventoryWidgetManager* InWidgetManager,
     const TCHAR* InWidgetPath,
     int32 InPoolSize,
     FName InPoolName,

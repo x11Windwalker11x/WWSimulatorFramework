@@ -20,7 +20,7 @@
 #include "Actors/Interactables/Item/Data/ItemData_Dynamic.h"
 #include "Components/OutlineComponent.h"
 #include "Components/DurabilityComponent.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "Engine/StreamableManager.h"
 #include "Lib/Data/ModularInteractionSystem/InteractionPredictionState.h"
 #include "InteractableActor_Master.generated.h"

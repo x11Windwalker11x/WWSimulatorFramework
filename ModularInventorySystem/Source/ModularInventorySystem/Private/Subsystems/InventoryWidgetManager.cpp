@@ -1,7 +1,7 @@
-// WidgetManager.cpp
-// Fill out your copyright notice in the Description page of Project Settings.
+// InventoryWidgetManager.cpp
+// Inventory-specific widget manager extending UWidgetManagerBase
 
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/InventoryComponent.h"
 #include "UI/HelperUI/ContextMenu/MIIS_RightClickContextMenu.h"
@@ -13,14 +13,14 @@
 // LIFECYCLE
 // ============================================================================
 
-void UWidgetManager::Initialize(FSubsystemCollectionBase& Collection)
+void UInventoryWidgetManager::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
-    
-    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("WidgetManager initialized"));
+
+    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("InventoryWidgetManager initialized"));
 }
 
-void UWidgetManager::Deinitialize()
+void UInventoryWidgetManager::Deinitialize()
 {
     ClearSelection();
     ExitQuestCombineMode();
@@ -30,52 +30,28 @@ void UWidgetManager::Deinitialize()
     Super::Deinitialize();
 }
 
-UWidgetManager* UWidgetManager::Get(APlayerController* PlayerController)
+UInventoryWidgetManager* UInventoryWidgetManager::Get(APlayerController* PlayerController)
 {
     if (!PlayerController)
     {
         return nullptr;
     }
-    
+
     ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
     if (!LocalPlayer)
     {
         return nullptr;
     }
-    
-    return LocalPlayer->GetSubsystem<UWidgetManager>();
+
+    return LocalPlayer->GetSubsystem<UInventoryWidgetManager>();
 }
 
 // ============================================================================
-// WIDGET MANAGEMENT
+// WIDGET MANAGEMENT (extends UWidgetManagerBase)
 // ============================================================================
+// Inherited from base: ShowWidget(), HideWidget(), HideAllWidgets(), IsWidgetShown(), GetActiveWidget()
 
-UUserWidget* UWidgetManager::ShowWidget(TSubclassOf<UUserWidget> WidgetClass, int32 ZOrder)
-{
-    APlayerController* PC = GetOwningPlayer();
-    if (!PC || !WidgetClass)
-    {
-        return nullptr;
-    }
-    
-    UUserWidget* Widget = CreateWidget<UUserWidget>(PC, WidgetClass);
-    if (Widget)
-    {
-        Widget->AddToViewport(ZOrder);
-    }
-    
-    return Widget;
-}
-
-void UWidgetManager::HideWidget(UUserWidget* Widget)
-{
-    if (Widget)
-    {
-        Widget->RemoveFromParent();
-    }
-}
-
-UUserWidget* UWidgetManager::ShowWidgetAtCursor(TSubclassOf<UUserWidget> WidgetClass, FVector2D Offset)
+UUserWidget* UInventoryWidgetManager::ShowWidgetAtCursor(TSubclassOf<UUserWidget> WidgetClass, FVector2D Offset)
 {
     APlayerController* PC = GetOwningPlayer();
     if (!PC || !WidgetClass)
@@ -97,7 +73,7 @@ UUserWidget* UWidgetManager::ShowWidgetAtCursor(TSubclassOf<UUserWidget> WidgetC
     return Widget;
 }
 
-void UWidgetManager::CloseActiveContextMenu()
+void UInventoryWidgetManager::CloseActiveContextMenu()
 {
     if (ActiveContextMenu)
     {
@@ -110,13 +86,13 @@ void UWidgetManager::CloseActiveContextMenu()
 // SLOT SELECTION
 // ============================================================================
 
-bool UWidgetManager::IsSlotSelected(FGameplayTag InventoryType, int32 SlotIndex) const
+bool UInventoryWidgetManager::IsSlotSelected(FGameplayTag InventoryType, int32 SlotIndex) const
 {
     FInventorySlotReference Ref(InventoryType, SlotIndex);
     return SelectedSlots.Contains(Ref);
 }
 
-void UWidgetManager::SelectSlot(FGameplayTag InventoryType, int32 SlotIndex)
+void UInventoryWidgetManager::SelectSlot(FGameplayTag InventoryType, int32 SlotIndex)
 {
     FInventorySlotReference Ref(InventoryType, SlotIndex);
     if (!SelectedSlots.Contains(Ref))
@@ -126,7 +102,7 @@ void UWidgetManager::SelectSlot(FGameplayTag InventoryType, int32 SlotIndex)
     }
 }
 
-void UWidgetManager::DeselectSlot(FGameplayTag InventoryType, int32 SlotIndex)
+void UInventoryWidgetManager::DeselectSlot(FGameplayTag InventoryType, int32 SlotIndex)
 {
     FInventorySlotReference Ref(InventoryType, SlotIndex);
     if (SelectedSlots.Remove(Ref) > 0)
@@ -135,7 +111,7 @@ void UWidgetManager::DeselectSlot(FGameplayTag InventoryType, int32 SlotIndex)
     }
 }
 
-void UWidgetManager::ToggleSlotSelection(FGameplayTag InventoryType, int32 SlotIndex)
+void UInventoryWidgetManager::ToggleSlotSelection(FGameplayTag InventoryType, int32 SlotIndex)
 {
     if (IsSlotSelected(InventoryType, SlotIndex))
     {
@@ -147,7 +123,7 @@ void UWidgetManager::ToggleSlotSelection(FGameplayTag InventoryType, int32 SlotI
     }
 }
 
-void UWidgetManager::ClearSelection()
+void UInventoryWidgetManager::ClearSelection()
 {
     if (SelectedSlots.Num() > 0)
     {
@@ -156,12 +132,12 @@ void UWidgetManager::ClearSelection()
     }
 }
 
-int32 UWidgetManager::GetSelectedSlotCount() const
+int32 UInventoryWidgetManager::GetSelectedSlotCount() const
 {
     return SelectedSlots.Num();
 }
 
-TArray<FInventorySlotReference> UWidgetManager::GetSelectedSlots() const
+TArray<FInventorySlotReference> UInventoryWidgetManager::GetSelectedSlots() const
 {
     return SelectedSlots;
 }
@@ -170,17 +146,17 @@ TArray<FInventorySlotReference> UWidgetManager::GetSelectedSlots() const
 // HELPER WIDGETS
 // ============================================================================
 
-void UWidgetManager::ShowSplitQuantityWidget(FGameplayTag InventoryType, int32 SlotIndex)
+void UInventoryWidgetManager::ShowSplitQuantityWidget(FGameplayTag InventoryType, int32 SlotIndex)
 {
     // TODO: Implement split quantity widget display
-    UE_LOG(LogInventoryInteractableSystem, Log, 
+    UE_LOG(LogInventoryInteractableSystem, Log,
         TEXT("ShowSplitQuantityWidget called for slot %d"), SlotIndex);
 }
 
-void UWidgetManager::ShowExamineWidget(FGameplayTag InventoryType, int32 SlotIndex)
+void UInventoryWidgetManager::ShowExamineWidget(FGameplayTag InventoryType, int32 SlotIndex)
 {
     // TODO: Implement examine widget display
-    UE_LOG(LogInventoryInteractableSystem, Log, 
+    UE_LOG(LogInventoryInteractableSystem, Log,
         TEXT("ShowExamineWidget called for slot %d"), SlotIndex);
 }
 
@@ -188,43 +164,43 @@ void UWidgetManager::ShowExamineWidget(FGameplayTag InventoryType, int32 SlotInd
 // QUEST COMBINE MODE
 // ============================================================================
 
-void UWidgetManager::EnterQuestCombineMode(FGameplayTag InventoryType, int32 SourceSlotIndex)
+void UInventoryWidgetManager::EnterQuestCombineMode(FGameplayTag InventoryType, int32 SourceSlotIndex)
 {
     // Exit attachment mode if active
     if (bIsInAttachmentMode)
     {
         ExitAttachmentMode();
     }
-    
+
     bIsInQuestCombineMode = true;
     QuestCombineSourceInventory = InventoryType;
     QuestCombineSourceSlot = SourceSlotIndex;
-    
-    UE_LOG(LogInventoryInteractableSystem, Log, 
-        TEXT("🧪 Entered Quest Combine Mode - Source: %s, Slot: %d"),
+
+    UE_LOG(LogInventoryInteractableSystem, Log,
+        TEXT("Entered Quest Combine Mode - Source: %s, Slot: %d"),
         *InventoryType.ToString(), SourceSlotIndex);
-    
+
     // Broadcast mode change so UI can update (highlight valid targets)
     OnSelectionModeChanged.Broadcast();
 }
 
-void UWidgetManager::ExitQuestCombineMode()
+void UInventoryWidgetManager::ExitQuestCombineMode()
 {
     if (!bIsInQuestCombineMode)
     {
         return;
     }
-    
+
     bIsInQuestCombineMode = false;
     QuestCombineSourceInventory = FGameplayTag();
     QuestCombineSourceSlot = -1;
-    
-    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("🧪 Exited Quest Combine Mode"));
-    
+
+    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("Exited Quest Combine Mode"));
+
     OnSelectionModeChanged.Broadcast();
 }
 
-void UWidgetManager::GetQuestCombineSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
+void UInventoryWidgetManager::GetQuestCombineSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
 {
     OutInventoryType = QuestCombineSourceInventory;
     OutSlotIndex = QuestCombineSourceSlot;
@@ -234,61 +210,61 @@ void UWidgetManager::GetQuestCombineSource(FGameplayTag& OutInventoryType, int32
 // ATTACHMENT MODE
 // ============================================================================
 
-void UWidgetManager::EnterAttachmentMode(FGameplayTag InventoryType, int32 AttachmentSlotIndex)
+void UInventoryWidgetManager::EnterAttachmentMode(FGameplayTag InventoryType, int32 AttachmentSlotIndex)
 {
     // Exit quest combine mode if active
     if (bIsInQuestCombineMode)
     {
         ExitQuestCombineMode();
     }
-    
+
     bIsInAttachmentMode = true;
     AttachmentSourceInventory = InventoryType;
     AttachmentSourceSlot = AttachmentSlotIndex;
-    
-    UE_LOG(LogInventoryInteractableSystem, Log, 
-        TEXT("🔧 Entered Attachment Mode - Source: %s, Slot: %d"),
+
+    UE_LOG(LogInventoryInteractableSystem, Log,
+        TEXT("Entered Attachment Mode - Source: %s, Slot: %d"),
         *InventoryType.ToString(), AttachmentSlotIndex);
-    
+
     // Broadcast mode change so UI can dim incompatible slots
     OnSelectionModeChanged.Broadcast();
 }
 
-void UWidgetManager::ExitAttachmentMode()
+void UInventoryWidgetManager::ExitAttachmentMode()
 {
     if (!bIsInAttachmentMode)
     {
         return;
     }
-    
+
     bIsInAttachmentMode = false;
     AttachmentSourceInventory = FGameplayTag();
     AttachmentSourceSlot = -1;
-    
-    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("🔧 Exited Attachment Mode"));
-    
+
+    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("Exited Attachment Mode"));
+
     OnSelectionModeChanged.Broadcast();
 }
 
-void UWidgetManager::GetAttachmentSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
+void UInventoryWidgetManager::GetAttachmentSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
 {
     OutInventoryType = AttachmentSourceInventory;
     OutSlotIndex = AttachmentSourceSlot;
 }
 
-bool UWidgetManager::CanSlotAcceptAttachment(FGameplayTag InventoryType, int32 SlotIndex) const
+bool UInventoryWidgetManager::CanSlotAcceptAttachment(FGameplayTag InventoryType, int32 SlotIndex) const
 {
     if (!bIsInAttachmentMode)
     {
         return false;
     }
-    
+
     UInventoryComponent* InventoryComp = GetPlayerInventoryComponent();
     if (!InventoryComp)
     {
         return false;
     }
-    
+
     // Delegate to InventoryComponent for actual compatibility check
     return InventoryComp->CanAttachToSlot(
         AttachmentSourceInventory, AttachmentSourceSlot,
@@ -300,7 +276,7 @@ bool UWidgetManager::CanSlotAcceptAttachment(FGameplayTag InventoryType, int32 S
 // COMPARE MODE
 // ============================================================================
 
-void UWidgetManager::EnterCompareMode(FGameplayTag InventoryType, int32 SlotIndex)
+void UInventoryWidgetManager::EnterCompareMode(FGameplayTag InventoryType, int32 SlotIndex)
 {
     // Exit other modes if active
     if (bIsInQuestCombineMode)
@@ -317,13 +293,13 @@ void UWidgetManager::EnterCompareMode(FGameplayTag InventoryType, int32 SlotInde
     CompareSourceSlot = SlotIndex;
 
     UE_LOG(LogInventoryInteractableSystem, Log,
-        TEXT("📊 Entered Compare Mode - Source: %s, Slot: %d"),
+        TEXT("Entered Compare Mode - Source: %s, Slot: %d"),
         *InventoryType.ToString(), SlotIndex);
 
     OnSelectionModeChanged.Broadcast();
 }
 
-void UWidgetManager::ExitCompareMode()
+void UInventoryWidgetManager::ExitCompareMode()
 {
     if (!bIsInCompareMode)
     {
@@ -334,12 +310,12 @@ void UWidgetManager::ExitCompareMode()
     CompareSourceInventory = FGameplayTag();
     CompareSourceSlot = INDEX_NONE;
 
-    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("📊 Exited Compare Mode"));
+    UE_LOG(LogInventoryInteractableSystem, Log, TEXT("Exited Compare Mode"));
 
     OnSelectionModeChanged.Broadcast();
 }
 
-void UWidgetManager::GetCompareSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
+void UInventoryWidgetManager::GetCompareSource(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
 {
     OutInventoryType = CompareSourceInventory;
     OutSlotIndex = CompareSourceSlot;
@@ -349,7 +325,7 @@ void UWidgetManager::GetCompareSource(FGameplayTag& OutInventoryType, int32& Out
 // HOVER TRACKING
 // ============================================================================
 
-bool UWidgetManager::GetHoveredInventorySlot(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
+bool UInventoryWidgetManager::GetHoveredInventorySlot(FGameplayTag& OutInventoryType, int32& OutSlotIndex) const
 {
     if (bHasHoveredSlot)
     {
@@ -363,14 +339,14 @@ bool UWidgetManager::GetHoveredInventorySlot(FGameplayTag& OutInventoryType, int
     return false;
 }
 
-void UWidgetManager::SetHoveredSlot(FGameplayTag InventoryType, int32 SlotIndex)
+void UInventoryWidgetManager::SetHoveredSlot(FGameplayTag InventoryType, int32 SlotIndex)
 {
     HoveredSlot.InventoryType = InventoryType;
     HoveredSlot.SlotIndex = SlotIndex;
     bHasHoveredSlot = true;
 }
 
-void UWidgetManager::ClearHoveredSlot()
+void UInventoryWidgetManager::ClearHoveredSlot()
 {
     HoveredSlot = FInventorySlotReference();
     bHasHoveredSlot = false;
@@ -379,31 +355,21 @@ void UWidgetManager::ClearHoveredSlot()
 // ============================================================================
 // HELPERS
 // ============================================================================
+// GetOwningPlayer() is inherited from UWidgetManagerBase
 
-UInventoryComponent* UWidgetManager::GetPlayerInventoryComponent() const
+UInventoryComponent* UInventoryWidgetManager::GetPlayerInventoryComponent() const
 {
     APlayerController* PC = GetOwningPlayer();
     if (!PC)
     {
         return nullptr;
     }
-    
+
     APawn* Pawn = PC->GetPawn();
     if (!Pawn)
     {
         return nullptr;
     }
-    
-    return Pawn->FindComponentByClass<UInventoryComponent>();
-}
 
-APlayerController* UWidgetManager::GetOwningPlayer() const
-{
-    ULocalPlayer* LocalPlayer = GetLocalPlayer();
-    if (!LocalPlayer)
-    {
-        return nullptr;
-    }
-    
-    return LocalPlayer->GetPlayerController(GetWorld());
+    return Pawn->FindComponentByClass<UInventoryComponent>();
 }

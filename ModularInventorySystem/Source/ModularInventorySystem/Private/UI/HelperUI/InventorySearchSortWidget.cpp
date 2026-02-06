@@ -9,7 +9,7 @@
 #include "Actors/Interactables/Item/Data/ItemData.h"
 #include "WW_TagLibrary.h"
 #include "Engine/DataTable.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 UInventorySearchSortWidget::UInventorySearchSortWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

@@ -5,7 +5,7 @@
 #include "UI/HelperUI/ContextMenu/DropQuantityWidget.h"
 #include "UI/HelperUI/ContextMenu/SplitQuantityWidget.h"
 #include "Windwalker_Productions_SharedDefaults/Public/WW_TagLibrary.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "Components/InventoryComponent.h"
 #include "Components/Button.h"
 #include "Components/VerticalBox.h"
@@ -78,7 +78,7 @@ void UMIIS_RightClickContextMenu::NativeDestruct()
     // Unregister from WidgetManager
     if (APlayerController* PC = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PC))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PC))
         {
             WidgetMgr->CloseActiveContextMenu();
         }
@@ -294,7 +294,7 @@ void UMIIS_RightClickContextMenu::OnSplitClicked()
     // Show split quantity widget
     if (APlayerController* PC = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PC))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PC))
         {
             WidgetMgr->ShowSplitQuantityWidget(TargetInventoryType, TargetSlotIndex);
         }
@@ -316,7 +316,7 @@ void UMIIS_RightClickContextMenu::OnExamineClicked()
     // Show examine UI
     if (APlayerController* PC = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PC))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PC))
         {
             WidgetMgr->ShowExamineWidget(TargetInventoryType, TargetSlotIndex);
         }
@@ -376,7 +376,7 @@ void UMIIS_RightClickContextMenu::OnCombineWithClicked()
     // Enter quest combine mode - highlight valid slots
     if (APlayerController* PC = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PC))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PC))
         {
             WidgetMgr->EnterQuestCombineMode(TargetInventoryType, TargetSlotIndex);
         }
@@ -399,7 +399,7 @@ void UMIIS_RightClickContextMenu::OnAttachToClicked()
     // Enter attachment mode - dim inappropriate slots
     if (APlayerController* PC = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PC))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PC))
         {
             WidgetMgr->EnterAttachmentMode(TargetInventoryType, TargetSlotIndex);
         }

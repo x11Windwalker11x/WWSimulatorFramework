@@ -10,7 +10,7 @@
 #include "Debug/DebugSubsystem.h"
 #include "InteractableComponent.generated.h"
 
-class UWidgetManager;
+class UWidgetManagerBase;
 
 //TODO: we have to set initial collision response for world static, dynamic and pawn to block
 //TODO: we have to set object type to either world static or dynamic by default.
@@ -251,7 +251,7 @@ protected:
 	// ========================================================================
 	
 	/** Get the widget manager for the local player */
-	UWidgetManager* GetWidgetManager() const;
+	UWidgetManagerBase* GetWidgetManager() const;
 	
 	/** Check if the actor can interact (e.g., is it a player?) */
 	virtual bool CanActorInteract(AActor* Actor) const;
@@ -274,5 +274,5 @@ private:
 	
 	/** Cached widget manager reference */
 	UPROPERTY()
-	TObjectPtr<UWidgetManager> CachedWidgetManager = nullptr;
+	TObjectPtr<UWidgetManagerBase> CachedWidgetManager = nullptr;
 };

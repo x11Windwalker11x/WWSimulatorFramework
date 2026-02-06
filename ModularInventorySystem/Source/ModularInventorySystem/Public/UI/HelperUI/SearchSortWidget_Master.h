@@ -8,7 +8,7 @@
 #include "MasterWidgets/ManagedWidget_Master.h"
 #include "GameplayTagContainer.h"
 #include "WW_SearchResultEntryWidget.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "SearchSortWidget_Master.generated.h"
 
 class UEditableText;
@@ -41,7 +41,7 @@ protected:
 	UPROPERTY(Transient)
 	APlayerController* PC;
 	UPROPERTY(Transient)
-	UWidgetManager* WidgetManager;
+	UInventoryWidgetManager* WidgetManager;
 	
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UEditableText* EditableText_SearchBar;

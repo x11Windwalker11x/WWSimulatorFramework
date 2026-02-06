@@ -210,12 +210,12 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Item_Flags_QuestItem, "Inventory.Item.Flags.QuestItem");
 
     //SIMULATOR FRAMEWORK DEVICE STATE TAGS
-    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Off, "Device.State.Off");
-    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Idle, "Device.State.Idle");
-    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_InUse, "Device.State.InUse");
-    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Broken, "Device.State.Broken");
-    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Maintenance, "Device.State.Maintenance");
-    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_NoPower, "Device.State.NoPower");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Off, "Simulator.Device.State.Off");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Idle, "Simulator.Device.State.Idle");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_InUse, "Simulator.Device.State.InUse");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Broken, "Simulator.Device.State.Broken");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_Maintenance, "Simulator.Device.State.Maintenance");
+    UE_DEFINE_GAMEPLAY_TAG(Simulator_Device_State_NoPower, "Simulator.Device.State.NoPower");
 
     //SIMULATOR FRAMEWORK APPLICATION STATE TAGS
     UE_DEFINE_GAMEPLAY_TAG(Simulator_Application_State_Closed, "Simulator.Application.State.Closed");

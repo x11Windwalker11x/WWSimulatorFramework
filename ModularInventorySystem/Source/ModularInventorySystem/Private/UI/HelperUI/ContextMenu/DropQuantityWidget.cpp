@@ -1,7 +1,7 @@
 // DropQuantityWidget.cpp
 #include "UI/HelperUI/ContextMenu/DropQuantityWidget.h"
 #include "Components/InventoryComponent.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "Components/Slider.h"
 #include "Components/EditableText.h"
 

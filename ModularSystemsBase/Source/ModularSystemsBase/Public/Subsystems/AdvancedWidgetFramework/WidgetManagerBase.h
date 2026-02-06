@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/LocalPlayerSubsystem.h"
+#include "GameplayTagContainer.h"
 #include "WidgetManagerBase.generated.h"
 
 class UUserWidget;
@@ -51,6 +52,59 @@ public:
     UFUNCTION(BlueprintPure, Category = "Widget Manager")
     UUserWidget* GetActiveWidget(TSubclassOf<UUserWidget> WidgetClass) const;
 
+    // === WIDGET REGISTRATION ===
+
+    /**
+     * Check if a widget class is registered for management
+     * @param WidgetClass - The widget class to check
+     * @return True if registered
+     */
+    UFUNCTION(BlueprintPure, Category = "Widget Manager")
+    bool IsWidgetRegistered(TSubclassOf<UUserWidget> WidgetClass) const;
+
+    /**
+     * Register a widget class for management
+     * @param WidgetClass - The widget class to register
+     * @param PoolSize - Number of instances to pre-create (0 = lazy creation)
+     * @param ZOrder - Z-order for display
+     * @param bAutoShow - Automatically show on registration
+     * @param bAllowMultiple - Allow multiple instances
+     */
+    UFUNCTION(BlueprintCallable, Category = "Widget Manager")
+    virtual void RegisterWidget(TSubclassOf<UUserWidget> WidgetClass, int32 PoolSize = 0, int32 ZOrder = 0, bool bAutoShow = false, bool bAllowMultiple = false);
+
+    /**
+     * Hide widget by class (convenience overload)
+     * @param WidgetClass - The widget class to hide
+     */
+    UFUNCTION(BlueprintCallable, Category = "Widget Manager")
+    void HideWidget(TSubclassOf<UUserWidget> WidgetClass);
+
+    // === WIDGET CATEGORY REGISTRATION ===
+
+    /**
+     * Register a widget with a category tag for stack management
+     * @param Widget - The widget to register
+     * @param CategoryTag - The category this widget belongs to
+     */
+    UFUNCTION(BlueprintCallable, Category = "Widget Manager")
+    virtual void RegisterWidgetWithCategory(UUserWidget* Widget, FGameplayTag CategoryTag);
+
+    /**
+     * Unregister a widget from the category stack
+     * @param Widget - The widget to unregister
+     */
+    UFUNCTION(BlueprintCallable, Category = "Widget Manager")
+    virtual void UnregisterWidgetFromStack(UUserWidget* Widget);
+
+    /**
+     * Get widgets by category tag
+     * @param CategoryTag - The category to filter by
+     * @return Array of widgets in this category
+     */
+    UFUNCTION(BlueprintPure, Category = "Widget Manager")
+    TArray<UUserWidget*> GetWidgetsByCategory(FGameplayTag CategoryTag) const;
+
     // === DELEGATES ===
 
     UPROPERTY(BlueprintAssignable, Category = "Widget Manager|Events")
@@ -66,4 +120,15 @@ protected:
     /** Active widgets tracked by class */
     UPROPERTY()
     TMap<TSubclassOf<UUserWidget>, TObjectPtr<UUserWidget>> ActiveWidgets;
+
+    /** Widgets tracked by category tag */
+    UPROPERTY()
+    TMap<FGameplayTag, TArray<TObjectPtr<UUserWidget>>> CategoryWidgets;
+
+    /** Registered widget classes with their settings */
+    UPROPERTY()
+    TSet<TSubclassOf<UUserWidget>> RegisteredWidgetClasses;
+
+    /** Default Z-order per registered class */
+    TMap<TSubclassOf<UUserWidget>, int32> WidgetZOrders;
 };

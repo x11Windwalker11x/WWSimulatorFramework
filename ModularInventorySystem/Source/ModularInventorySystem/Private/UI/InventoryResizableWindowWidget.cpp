@@ -11,6 +11,7 @@
 #include "WW_TagLibrary.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "UI/HelperUI/InventorySearchSortWidget.h"
+#include "Subsystems/InventoryWidgetManager.h"
 
 // ============================================================================
 // WIDGET LIFECYCLE
@@ -49,7 +50,7 @@ void UInventoryResizableWindowWidget::NativeDestruct()
     // Close any active context menu when inventory window closes
     if (APlayerController* PC = GetOwningPlayer())
     {
-        if (UWidgetManager* WidgetMgr = UWidgetManager::Get(PC))
+        if (UInventoryWidgetManager* WidgetMgr = UInventoryWidgetManager::Get(PC))
         {
             WidgetMgr->CloseActiveContextMenu();
             

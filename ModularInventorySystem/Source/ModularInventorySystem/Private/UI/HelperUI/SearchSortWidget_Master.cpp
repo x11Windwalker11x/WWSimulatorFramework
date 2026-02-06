@@ -5,7 +5,7 @@
 #include "Components/ScrollBox.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
-#include "Subsystems/WidgetManager.h"
+#include "Subsystems/InventoryWidgetManager.h"
 #include "WW_TagLibrary.h"
 #include "UI/InventorySlotWidget.h"
 #include "Framework/Application/SlateApplication.h"
@@ -33,7 +33,7 @@ void USearchSortWidget_Master::NativeConstruct()
 	if (OwningPlayer && OwningPlayer->IsLocalPlayerController())
 	{
 		PC = OwningPlayer;
-		WidgetManager = UWidgetManager::Get(PC);
+		WidgetManager = UInventoryWidgetManager::Get(PC);
 	}
 
 	// Initialize search bar with placeholder

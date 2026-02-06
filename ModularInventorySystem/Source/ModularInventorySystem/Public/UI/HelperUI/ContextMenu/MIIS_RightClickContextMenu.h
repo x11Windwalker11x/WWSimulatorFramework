@@ -13,7 +13,7 @@
 class UButton;
 class UVerticalBox;
 class UInventoryComponent;
-class UWidgetManager;
+class UInventoryWidgetManager;
 
 /**
  * Right-Click Context Menu for Inventory Slots
