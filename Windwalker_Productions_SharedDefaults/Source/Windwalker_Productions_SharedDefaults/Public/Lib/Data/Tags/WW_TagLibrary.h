@@ -229,6 +229,40 @@ public:
     static const FGameplayTag& Interaction_State_Cooldown();
     
     // ================================================================
+    // ITEM TAGS (Pickupable world items — distinct from Inventory.Item.*)
+    // ================================================================
+
+    /** Item.Type.Weapon.Ranged - Ranged weapon pickupable */
+    static const FGameplayTag& Item_Type_Weapon_Ranged();
+
+    /** Item.Type.Weapon.Melee - Melee weapon pickupable */
+    static const FGameplayTag& Item_Type_Weapon_Melee();
+
+    /** Item.Type.Throwable - Throwable pickupable */
+    static const FGameplayTag& Item_Type_Throwable();
+
+    /** Item.Type.Armor - Armor pickupable */
+    static const FGameplayTag& Item_Type_Armor();
+
+    /** Item.Type.Consumable - Consumable pickupable */
+    static const FGameplayTag& Item_Type_Consumable();
+
+    /** Item.Rarity.Common - Common rarity */
+    static const FGameplayTag& Item_Rarity_Common();
+
+    /** Item.Rarity.Uncommon - Uncommon rarity */
+    static const FGameplayTag& Item_Rarity_Uncommon();
+
+    /** Item.Rarity.Rare - Rare rarity */
+    static const FGameplayTag& Item_Rarity_Rare();
+
+    /** Item.Rarity.Epic - Epic rarity */
+    static const FGameplayTag& Item_Rarity_Epic();
+
+    /** Item.Rarity.Legendary - Legendary rarity */
+    static const FGameplayTag& Item_Rarity_Legendary();
+
+    // ================================================================
     // INVENTORY TAGS
     // ================================================================
 	

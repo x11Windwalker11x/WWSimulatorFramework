@@ -28,3 +28,20 @@ void UManagedWidget_Master::NativeDestruct()
 
 	Super::NativeDestruct();
 }
+
+// IManagedWidgetInterface
+
+UObject* UManagedWidget_Master::GetManagedWidgetAsObject_Implementation()
+{
+	return this;
+}
+
+FGameplayTag UManagedWidget_Master::GetWidgetCategoryTag_Implementation() const
+{
+	return WidgetCategoryTag;
+}
+
+bool UManagedWidget_Master::IsValidWidget_Implementation() const
+{
+	return true;
+}

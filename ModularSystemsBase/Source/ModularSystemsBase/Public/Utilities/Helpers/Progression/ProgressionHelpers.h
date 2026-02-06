@@ -143,9 +143,37 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "Progression")
     static void AddXP(FStationXPPool& StationXPPool,int32 Amount);
-    
+
     UFUNCTION(BlueprintPure, Category = "Progression")
     static bool SpendXP(FStationXPPool& StationXPPool, int32 Amount);
-    
-    
+
+    /*--- FTOOLINSTANCEDATA HELPERS ---*/
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static float GetMaxDurability(const FToolInstanceData& Data);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static float GetDurabilityLossPerUse(const FToolInstanceData& Data);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static float GetDurabilityPercent(const FToolInstanceData& Data);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static int32 GetLevelUpCost(const FToolInstanceData& Data);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static void ApplyWear(FToolInstanceData& Data);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static void Repair(FToolInstanceData& Data, float Amount);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static void RepairFull(FToolInstanceData& Data);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static bool IsBroken(const FToolInstanceData& Data);
+
+    UFUNCTION(BlueprintPure, Category = "Progression")
+    static float AddXP(FToolInstanceData& Data, const int32& Amount);
+
 };

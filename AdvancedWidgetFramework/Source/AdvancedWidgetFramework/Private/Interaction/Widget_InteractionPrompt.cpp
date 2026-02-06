@@ -27,10 +27,27 @@ void UWidget_InteractionPrompt::SetInteractionKey(const FText& KeyText)
     if (PromptText)
     {
         FText FullText = FText::Format(
-            INVTEXT("Press [{0}] {1}"), 
-            KeyText, 
+            INVTEXT("Press [{0}] {1}"),
+            KeyText,
             INVTEXT("to interact")
         );
         PromptText->SetText(FullText);
     }
+}
+
+// IManagedWidgetInterface
+
+UObject* UWidget_InteractionPrompt::GetManagedWidgetAsObject_Implementation()
+{
+    return this;
+}
+
+FGameplayTag UWidget_InteractionPrompt::GetWidgetCategoryTag_Implementation() const
+{
+    return FGameplayTag();
+}
+
+bool UWidget_InteractionPrompt::IsValidWidget_Implementation() const
+{
+    return bIsValidWidget;
 }

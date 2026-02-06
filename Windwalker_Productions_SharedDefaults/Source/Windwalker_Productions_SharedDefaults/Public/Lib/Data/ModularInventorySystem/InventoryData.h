@@ -263,42 +263,42 @@ struct WINDWALKER_PRODUCTIONS_SHAREDDEFAULTS_API FItemData : public FPickupableD
 
     FORCEINLINE FLinearColor GetRarityColor() const
     {
-        if (Rarity.MatchesTag(FGameplayTag::RequestGameplayTag("Item.Rarity.Legendary")))
+        if (Rarity.MatchesTag(FWWTagLibrary::Item_Rarity_Legendary()))
             return FLinearColor(1.0f, 0.5f, 0.0f, 1.0f);  // Orange
-        if (Rarity.MatchesTag(FGameplayTag::RequestGameplayTag("Item.Rarity.Epic")))
+        if (Rarity.MatchesTag(FWWTagLibrary::Item_Rarity_Epic()))
             return FLinearColor(0.58f, 0.0f, 0.83f, 1.0f);  // Purple
-        if (Rarity.MatchesTag(FGameplayTag::RequestGameplayTag("Item.Rarity.Rare")))
+        if (Rarity.MatchesTag(FWWTagLibrary::Item_Rarity_Rare()))
             return FLinearColor(0.0f, 0.44f, 0.87f, 1.0f);  // Blue
-        if (Rarity.MatchesTag(FGameplayTag::RequestGameplayTag("Item.Rarity.Uncommon")))
+        if (Rarity.MatchesTag(FWWTagLibrary::Item_Rarity_Uncommon()))
             return FLinearColor(0.12f, 0.56f, 0.1f, 1.0f);  // Green
-        if (Rarity.MatchesTag(FGameplayTag::RequestGameplayTag("Item.Rarity.Common")))
+        if (Rarity.MatchesTag(FWWTagLibrary::Item_Rarity_Common()))
             return FLinearColor(0.7f, 0.7f, 0.7f, 1.0f);  // Gray
-        
+
         return FLinearColor(0.3f, 0.3f, 0.3f, 1.0f);  // Default
     }
-    FORCEINLINE bool IsRangedWeapon() const 
-    { 
-        return BaseTags.HasTag(FGameplayTag::RequestGameplayTag(TEXT("Item.Type.Weapon.Ranged"))); 
+    FORCEINLINE bool IsRangedWeapon() const
+    {
+        return BaseTags.HasTag(FWWTagLibrary::Item_Type_Weapon_Ranged());
     }
-    
-    FORCEINLINE bool IsMeleeWeapon() const 
-    { 
-        return BaseTags.HasTag(FGameplayTag::RequestGameplayTag(TEXT("Item.Type.Weapon.Melee"))); 
+
+    FORCEINLINE bool IsMeleeWeapon() const
+    {
+        return BaseTags.HasTag(FWWTagLibrary::Item_Type_Weapon_Melee());
     }
-    
-    FORCEINLINE bool IsThrowable() const 
-    { 
-        return BaseTags.HasTag(FGameplayTag::RequestGameplayTag(TEXT("Item.Type.Throwable"))); 
+
+    FORCEINLINE bool IsThrowable() const
+    {
+        return BaseTags.HasTag(FWWTagLibrary::Item_Type_Throwable());
     }
-    
-    FORCEINLINE bool IsArmor() const 
-    { 
-        return BaseTags.HasTag(FGameplayTag::RequestGameplayTag(TEXT("Item.Type.Armor"))); 
+
+    FORCEINLINE bool IsArmor() const
+    {
+        return BaseTags.HasTag(FWWTagLibrary::Item_Type_Armor());
     }
-    
-    FORCEINLINE bool IsConsumable() const 
-    { 
-        return BaseTags.HasTag(FGameplayTag::RequestGameplayTag(TEXT("Item.Type.Consumable"))); 
+
+    FORCEINLINE bool IsConsumable() const
+    {
+        return BaseTags.HasTag(FWWTagLibrary::Item_Type_Consumable());
     }
     
     FORCEINLINE bool IsWeapon() const { return IsRangedWeapon() || IsMeleeWeapon(); }

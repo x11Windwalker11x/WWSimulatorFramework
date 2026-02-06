@@ -370,3 +370,72 @@ bool UProgressionHelpers::SpendXP(FStationXPPool& StationXPPool, int32 Amount)
     }
     return false;
 }
+
+/*--- FTOOLINSTANCEDATA HELPERS ---*/
+
+float UProgressionHelpers::GetMaxDurability(const FToolInstanceData& Data)
+{
+    float TierMult = FMath::Pow(1.5f, Data.Tier - 1);
+    float LevelMult = FMath::Pow(1.2f, Data.Level - 1);
+    return 100.0f * TierMult * LevelMult;
+}
+
+float UProgressionHelpers::GetDurabilityLossPerUse(const FToolInstanceData& Data)
+{
+    float TierReduction = 1.0f / Data.Tier;
+    float LevelReduction = 1.0f - (Data.Level - 1) * 0.1f;
+    return 1.0f * TierReduction * LevelReduction;
+}
+
+float UProgressionHelpers::GetDurabilityPercent(const FToolInstanceData& Data)
+{
+    float Max = GetMaxDurability(Data);
+    return Max > 0.0f ? (Data.CurrentDurability / Max) * 100.0f : 0.0f;
+}
+
+int32 UProgressionHelpers::GetLevelUpCost(const FToolInstanceData& Data)
+{
+    if (Data.Level >= 3) return 0;
+    int32 NextLevel = Data.Level + 1;
+    int32 BaseCost = 25 * NextLevel * (NextLevel - 1) - 25 * Data.Level * (Data.Level - 1);
+    float TierFactor = FMath::Pow(1.5f, Data.Tier - 1);
+    return FMath::RoundToInt(BaseCost * TierFactor);
+}
+
+void UProgressionHelpers::ApplyWear(FToolInstanceData& Data)
+{
+    float Wear = GetDurabilityLossPerUse(Data);
+    Data.CurrentDurability = FMath::Max(0.0f, Data.CurrentDurability - Wear);
+}
+
+void UProgressionHelpers::Repair(FToolInstanceData& Data, float Amount)
+{
+    float Max = GetMaxDurability(Data);
+    Data.CurrentDurability = FMath::Min(Max, Data.CurrentDurability + Amount);
+}
+
+void UProgressionHelpers::RepairFull(FToolInstanceData& Data)
+{
+    Data.CurrentDurability = GetMaxDurability(Data);
+}
+
+bool UProgressionHelpers::IsBroken(const FToolInstanceData& Data)
+{
+    return Data.CurrentDurability <= 0.0f;
+}
+
+float UProgressionHelpers::AddXP(FToolInstanceData& Data, const int32& Amount)
+{
+    Data.CurrentXP += Amount;
+
+    bool bLeveledUp = false;
+    int32 XPNeeded = GetXPRequiredForLevel(Data.Level + 1);
+    while (Data.CurrentXP >= XPNeeded && Data.Level < 3)
+    {
+        Data.CurrentXP -= XPNeeded;
+        Data.Level++;
+        bLeveledUp = true;
+        XPNeeded = GetXPRequiredForLevel(Data.Level + 1);
+    }
+    return bLeveledUp ? 1.0f : 0.0f;
+}

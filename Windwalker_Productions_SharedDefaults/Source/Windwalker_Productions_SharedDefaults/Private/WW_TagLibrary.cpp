@@ -105,6 +105,18 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Interaction_State_Mashing, "Interaction.State.Mashing");
     UE_DEFINE_GAMEPLAY_TAG(Interaction_State_Cooldown, "Interaction.State.Cooldown");
     
+    // ITEM TAGS (Pickupable world items)
+    UE_DEFINE_GAMEPLAY_TAG(Item_Type_Weapon_Ranged, "Item.Type.Weapon.Ranged");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Type_Weapon_Melee, "Item.Type.Weapon.Melee");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Type_Throwable, "Item.Type.Throwable");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Type_Armor, "Item.Type.Armor");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Type_Consumable, "Item.Type.Consumable");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Rarity_Common, "Item.Rarity.Common");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Rarity_Uncommon, "Item.Rarity.Uncommon");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Rarity_Rare, "Item.Rarity.Rare");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Rarity_Epic, "Item.Rarity.Epic");
+    UE_DEFINE_GAMEPLAY_TAG(Item_Rarity_Legendary, "Item.Rarity.Legendary");
+
     // INVENTORY TAGS
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Item_Type_Attachment, "Inventory.Item.Type.Attachment");
     UE_DEFINE_GAMEPLAY_TAG(Inventory_Item_Type_Wearable, "Inventory.Item.Type.Wearable");
@@ -743,6 +755,68 @@ const FGameplayTag& FWWTagLibrary::Interaction_State_Cooldown()
     return Tag; 
 }
 
+
+// ITEM TAGS (Pickupable world items)
+
+const FGameplayTag& FWWTagLibrary::Item_Type_Weapon_Ranged()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Type_Weapon_Ranged;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Type_Weapon_Melee()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Type_Weapon_Melee;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Type_Throwable()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Type_Throwable;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Type_Armor()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Type_Armor;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Type_Consumable()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Type_Consumable;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Rarity_Common()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Rarity_Common;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Rarity_Uncommon()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Rarity_Uncommon;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Rarity_Rare()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Rarity_Rare;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Rarity_Epic()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Rarity_Epic;
+    return Tag;
+}
+
+const FGameplayTag& FWWTagLibrary::Item_Rarity_Legendary()
+{
+    static const FGameplayTag& Tag = WW_Internal::Item_Rarity_Legendary;
+    return Tag;
+}
 
 // INVENTORY TAGS
 

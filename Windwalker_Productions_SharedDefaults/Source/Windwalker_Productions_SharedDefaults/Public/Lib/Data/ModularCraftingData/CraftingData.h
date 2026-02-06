@@ -145,62 +145,6 @@ struct FToolInstanceData : public FTableRowBase
     UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Tool")
     float CurrentDurability = 100.0f;
 
-    // Stat getters - same formulas as station
-    /*DEPRECIATED! USE PROGRESSIONHELPERS INSTEAD.*/
-    // float GetMaxDurability() const
-    // {
-    //     float TierMult = FMath::Pow(1.5f, Tier - 1);
-    //     float LevelMult = FMath::Pow(1.2f, Level - 1);
-    //     return 100.0f * TierMult * LevelMult;
-    // }
-
-    // float GetDurabilityLossPerUse() const
-    // {
-    //     float TierReduction = 1.0f / Tier;
-    //     float LevelReduction = 1.0f - (Level - 1) * 0.1f;
-    //     return 1.0f * TierReduction * LevelReduction;
-    // }
- // int32 GetLevelUpCost() const
- //    {
- //        if (Level >= 3) return 0;
- //        int32 NextLevel = Level + 1;
- //        int32 BaseCost = 25 * NextLevel * (NextLevel - 1) - 25 * Level * (Level - 1);
- //        float TierFactor = FMath::Pow(1.5f, Tier - 1);
- //        return FMath::RoundToInt(BaseCost * TierFactor);
- //    }
- //    void AddXP(int32 Amount)
-         //    {
-         //        if (Amount > 0)
-         //        {
-         //            CurrentXP += Amount;
-         //        }
-         //    }
- //    float GetDurabilityPercent() const
-                 //    {
-                 //        float Max = GetMaxDurability();
-                 //        return Max > 0.0f ? (CurrentDurability / Max) * 100.0f : 0.0f;
-                 //    }
-    // void ApplyWear()
-    //     {
-    //         CurrentDurability = FMath::Max(0.0f, CurrentDurability - GetDurabilityLossPerUse());
-    //     }
-    //
-    //     bool IsBroken() const
-    //     {
-    //         return CurrentDurability <= 0.0f;
-    //     }
-    //
-    //     void Repair(float Amount)
-    //     {
-    //         CurrentDurability = FMath::Min(GetMaxDurability(), CurrentDurability + Amount);
-    //     }
-    //
-    //     void RepairFull()
-    //     {
-    //         CurrentDurability = GetMaxDurability();
-    //     }
-    
-   
     bool IsValid() const
     {
         return Tier >= 1 && Tier <= 3 && Level >= 1 && Level <= 3;
