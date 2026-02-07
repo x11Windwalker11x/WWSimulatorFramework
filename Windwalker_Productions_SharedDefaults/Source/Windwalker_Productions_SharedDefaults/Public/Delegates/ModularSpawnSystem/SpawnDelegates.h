@@ -17,3 +17,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
 	FSpawnDelegateOnPoolExhausted,
 	FName, PoolID);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FSpawnDelegateOnWaveComplete,
+	int32, WaveIndex,
+	int32, TotalWaves);
+

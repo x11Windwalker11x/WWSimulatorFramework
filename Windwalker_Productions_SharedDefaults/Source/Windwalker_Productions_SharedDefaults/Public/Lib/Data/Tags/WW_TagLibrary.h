@@ -649,6 +649,25 @@ public:
 
 
     // ================================================================
+    // SPAWN SYSTEM TAGS
+    // ================================================================
+
+    /** Spawn.Type.Pickup - Spawn type: pickupable world item */
+    static const FGameplayTag& Spawn_Type_Pickup();
+
+    /** Spawn.Type.AI - Spawn type: AI character */
+    static const FGameplayTag& Spawn_Type_AI();
+
+    /** Spawn.Type.Prop - Spawn type: static prop or interactable */
+    static const FGameplayTag& Spawn_Type_Prop();
+
+    /** Spawn.Cleanup.Lifetime - Actor has lifetime-based auto-cleanup */
+    static const FGameplayTag& Spawn_Cleanup_Lifetime();
+
+    /** Spawn.Cleanup.Immediate - Actor cleaned up immediately when returned */
+    static const FGameplayTag& Spawn_Cleanup_Immediate();
+
+    // ================================================================
     // CHEAT TAGS
     // ================================================================
     

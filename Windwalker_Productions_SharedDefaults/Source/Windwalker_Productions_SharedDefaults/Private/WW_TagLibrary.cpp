@@ -328,6 +328,13 @@ namespace WW_Internal
 
     // UI DOCK ZONE TAGS
     UE_DEFINE_GAMEPLAY_TAG(UI_Dock_Zone, "UI.Dock.Zone");
+
+    // SPAWN SYSTEM TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Spawn_Type_Pickup, "Spawn.Type.Pickup");
+    UE_DEFINE_GAMEPLAY_TAG(Spawn_Type_AI, "Spawn.Type.AI");
+    UE_DEFINE_GAMEPLAY_TAG(Spawn_Type_Prop, "Spawn.Type.Prop");
+    UE_DEFINE_GAMEPLAY_TAG(Spawn_Cleanup_Lifetime, "Spawn.Cleanup.Lifetime");
+    UE_DEFINE_GAMEPLAY_TAG(Spawn_Cleanup_Immediate, "Spawn.Cleanup.Immediate");
 }
 
 // Implement public accessor functions
@@ -1617,3 +1624,10 @@ const FGameplayTag& FWWTagLibrary::UI_Dock_Zone()
     static const FGameplayTag& Tag = WW_Internal::UI_Dock_Zone;
     return Tag;
 }
+
+// SPAWN SYSTEM TAGS
+const FGameplayTag& FWWTagLibrary::Spawn_Type_Pickup() { static const FGameplayTag& Tag = WW_Internal::Spawn_Type_Pickup; return Tag; }
+const FGameplayTag& FWWTagLibrary::Spawn_Type_AI() { static const FGameplayTag& Tag = WW_Internal::Spawn_Type_AI; return Tag; }
+const FGameplayTag& FWWTagLibrary::Spawn_Type_Prop() { static const FGameplayTag& Tag = WW_Internal::Spawn_Type_Prop; return Tag; }
+const FGameplayTag& FWWTagLibrary::Spawn_Cleanup_Lifetime() { static const FGameplayTag& Tag = WW_Internal::Spawn_Cleanup_Lifetime; return Tag; }
+const FGameplayTag& FWWTagLibrary::Spawn_Cleanup_Immediate() { static const FGameplayTag& Tag = WW_Internal::Spawn_Cleanup_Immediate; return Tag; }

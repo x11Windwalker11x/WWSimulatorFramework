@@ -30,7 +30,8 @@ public class ModularSpawnSystem : ModuleRules
 				"Engine",
 				"GameplayTags",
 				"Windwalker_Productions_SharedDefaults",
-				"ModularSystemsBase"
+				"ModularSystemsBase",
+				"NavigationSystem"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

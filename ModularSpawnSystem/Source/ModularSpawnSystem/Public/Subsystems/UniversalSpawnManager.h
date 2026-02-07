@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Delegates/ModularSpawnSystem/SpawnDelegates.h"
+#include "Lib/Data/ModularSpawnSystem/SpawnData.h"
+#include "Lib/Data/ModularInventorySystem/InventoryData.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "GameplayTagContainer.h"
 #include "UniversalSpawnManager.generated.h"
@@ -86,6 +89,22 @@ public:
 	static UUniversalSpawnManager* Get(const UObject* WorldContextObject);
 
 	// ============================================================================
+	// DELEGATES
+	// ============================================================================
+
+	/** Broadcast when an actor is spawned */
+	UPROPERTY(BlueprintAssignable, Category = "Spawn Manager|Delegates")
+	FSpawnDelegateOnActorSpawned OnActorSpawned;
+
+	/** Broadcast when an actor is despawned or returned to pool */
+	UPROPERTY(BlueprintAssignable, Category = "Spawn Manager|Delegates")
+	FSpawnDelegateOnActorDespawned OnActorDespawned;
+
+	/** Broadcast when a pool is exhausted (full, actor destroyed instead) */
+	UPROPERTY(BlueprintAssignable, Category = "Spawn Manager|Delegates")
+	FSpawnDelegateOnPoolExhausted OnPoolExhausted;
+
+	// ============================================================================
 	// GENERIC ACTOR SPAWNING - COMPONENT AGNOSTIC
 	// ============================================================================
 
@@ -146,6 +165,111 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spawn Manager")
 	void ReturnActorToPool(AActor* Actor);
 
+	/**
+	 * Spawn actor from a FSpawnRequest struct
+	 * @param Request - Spawn configuration
+	 * @param ItemID - Optional ItemID for interface initialization
+	 * @param Quantity - Optional quantity for interface initialization
+	 * @return The spawned actor, or nullptr if spawn failed
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager")
+	AActor* SpawnFromRequest(const FSpawnRequest& Request, FName ItemID = NAME_None, int32 Quantity = 1);
+
+	/**
+	 * Register an actor for automatic cleanup after a lifetime duration
+	 * @param Actor - The actor to register
+	 * @param Lifetime - Seconds until cleanup
+	 * @param bReturnToPool - Return to pool instead of destroying
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager")
+	void RegisterForCleanup(AActor* Actor, float Lifetime, bool bReturnToPool = true);
+
+	// ============================================================================
+	// POOL MANAGEMENT
+	// ============================================================================
+
+	/**
+	 * Pre-spawn actors into the pool for a class to avoid spawn hitches
+	 * @param ActorClass - Class to prewarm
+	 * @param Count - Number of actors to pre-spawn
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager|Pool")
+	void PrewarmPool(TSubclassOf<AActor> ActorClass, int32 Count);
+
+	/**
+	 * Get pool statistics for a specific actor class
+	 */
+	UFUNCTION(BlueprintPure, Category = "Spawn Manager|Pool")
+	FPoolStats GetPoolStats(TSubclassOf<AActor> ActorClass) const;
+
+	/** Log all pool stats to output log */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager|Pool")
+	void LogAllPoolStats() const;
+
+	// ============================================================================
+	// AI & PROP SPAWNING
+	// ============================================================================
+
+	/**
+	 * Spawn an AI actor at a navmesh-valid location near Origin
+	 * @param ActorClass - AI actor class to spawn
+	 * @param Origin - Desired spawn location
+	 * @param SearchRadius - Navmesh search radius for valid location
+	 * @return The spawned actor, or nullptr if no valid location
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager")
+	AActor* SpawnAI(TSoftClassPtr<AActor> ActorClass, FVector Origin, float SearchRadius = 500.f);
+
+	/**
+	 * Spawn a static prop/interactable, snapped to ground
+	 * @param ActorClass - Prop actor class to spawn
+	 * @param Location - Desired spawn location
+	 * @param Rotation - Spawn rotation
+	 * @return The spawned actor
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager")
+	AActor* SpawnProp(TSoftClassPtr<AActor> ActorClass, FVector Location, FRotator Rotation = FRotator::ZeroRotator);
+
+	// ============================================================================
+	// DROP TABLE & SCATTER SPAWNING
+	// ============================================================================
+
+	/**
+	 * Process a drop table and spawn resulting items scattered around an origin
+	 * @param DropTable - Array of drop table entries to process
+	 * @param Origin - Center point for scattered spawning
+	 * @param ScatterRadius - Max radius for scatter positioning
+	 * @param ItemActorClass - Actor class for spawned items
+	 * @param Looter - Optional actor to check drop requirements against
+	 * @return Array of spawned actors
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager")
+	TArray<AActor*> SpawnFromDropTable(
+		const TArray<FDropTableEntry>& DropTable,
+		FVector Origin,
+		float ScatterRadius,
+		TSoftClassPtr<AActor> ItemActorClass,
+		AActor* Looter = nullptr
+	);
+
+	/**
+	 * Spawn multiple actors of the same class scattered around an origin
+	 * @param ActorClass - Class to spawn
+	 * @param Origin - Center point
+	 * @param Count - Number to spawn
+	 * @param MinRadius - Minimum scatter distance
+	 * @param MaxRadius - Maximum scatter distance
+	 * @return Array of spawned actors
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn Manager")
+	TArray<AActor*> SpawnScattered(
+		TSoftClassPtr<AActor> ActorClass,
+		FVector Origin,
+		int32 Count,
+		float MinRadius,
+		float MaxRadius
+	);
+
 protected:
 	// ============================================================================
 	// CONFIGURATION
@@ -170,6 +294,9 @@ protected:
 	/** All active spawned actors */
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> ActiveActors;
+
+	/** Per-class pool statistics */
+	TMap<UClass*, FPoolStats> PoolStatsMap;
 
 	// ============================================================================
 	// CLEANUP SYSTEM
