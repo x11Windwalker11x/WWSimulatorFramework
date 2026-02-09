@@ -734,7 +734,43 @@ public:
     
     /** Debug.Widget - Debug layer for Widgets */
     static const FGameplayTag& Debug_Widget();
-    
+
+    /** Debug.Economy - Debug layer for economy system */
+    static const FGameplayTag& Debug_Economy();
+
+    // ================================================================
+    // ECONOMY TAGS
+    // ================================================================
+
+    /** Economy.Category.Utility - Utility bills (power, water, gas) */
+    static const FGameplayTag& Economy_Category_Utility();
+
+    /** Economy.Category.Wages - Employee wages and salaries */
+    static const FGameplayTag& Economy_Category_Wages();
+
+    /** Economy.Category.Rent - Property rent and lease payments */
+    static const FGameplayTag& Economy_Category_Rent();
+
+    /** Economy.Category.Supply - Raw material and supply purchases */
+    static const FGameplayTag& Economy_Category_Supply();
+
+    /** Economy.Category.Sales - Revenue from product sales */
+    static const FGameplayTag& Economy_Category_Sales();
+
+    /** Economy.Category.Maintenance - Equipment repair and upkeep costs */
+    static const FGameplayTag& Economy_Category_Maintenance();
+
+    /** Economy.Category.Misc - Miscellaneous income or expenses */
+    static const FGameplayTag& Economy_Category_Misc();
+
+    /** Economy.Resource.Electricity - Electrical power consumption */
+    static const FGameplayTag& Economy_Resource_Electricity();
+
+    /** Economy.Resource.Water - Water consumption */
+    static const FGameplayTag& Economy_Resource_Water();
+
+    /** Economy.Resource.Gas - Gas consumption */
+    static const FGameplayTag& Economy_Resource_Gas();
 };
 
 

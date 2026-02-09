@@ -335,6 +335,19 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Spawn_Type_Prop, "Spawn.Type.Prop");
     UE_DEFINE_GAMEPLAY_TAG(Spawn_Cleanup_Lifetime, "Spawn.Cleanup.Lifetime");
     UE_DEFINE_GAMEPLAY_TAG(Spawn_Cleanup_Immediate, "Spawn.Cleanup.Immediate");
+
+    // ECONOMY TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Utility, "Economy.Category.Utility");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Wages, "Economy.Category.Wages");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Rent, "Economy.Category.Rent");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Supply, "Economy.Category.Supply");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Sales, "Economy.Category.Sales");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Maintenance, "Economy.Category.Maintenance");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Misc, "Economy.Category.Misc");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Resource_Electricity, "Economy.Resource.Electricity");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Resource_Water, "Economy.Resource.Water");
+    UE_DEFINE_GAMEPLAY_TAG(Economy_Resource_Gas, "Economy.Resource.Gas");
+    UE_DEFINE_GAMEPLAY_TAG(Debug_Economy, "Debug.Economy");
 }
 
 // Implement public accessor functions
@@ -1631,3 +1644,16 @@ const FGameplayTag& FWWTagLibrary::Spawn_Type_AI() { static const FGameplayTag& 
 const FGameplayTag& FWWTagLibrary::Spawn_Type_Prop() { static const FGameplayTag& Tag = WW_Internal::Spawn_Type_Prop; return Tag; }
 const FGameplayTag& FWWTagLibrary::Spawn_Cleanup_Lifetime() { static const FGameplayTag& Tag = WW_Internal::Spawn_Cleanup_Lifetime; return Tag; }
 const FGameplayTag& FWWTagLibrary::Spawn_Cleanup_Immediate() { static const FGameplayTag& Tag = WW_Internal::Spawn_Cleanup_Immediate; return Tag; }
+
+// ECONOMY TAGS
+const FGameplayTag& FWWTagLibrary::Economy_Category_Utility() { static const FGameplayTag& Tag = WW_Internal::Economy_Category_Utility; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Category_Wages() { static const FGameplayTag& Tag = WW_Internal::Economy_Category_Wages; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Category_Rent() { static const FGameplayTag& Tag = WW_Internal::Economy_Category_Rent; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Category_Supply() { static const FGameplayTag& Tag = WW_Internal::Economy_Category_Supply; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Category_Sales() { static const FGameplayTag& Tag = WW_Internal::Economy_Category_Sales; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Category_Maintenance() { static const FGameplayTag& Tag = WW_Internal::Economy_Category_Maintenance; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Category_Misc() { static const FGameplayTag& Tag = WW_Internal::Economy_Category_Misc; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Resource_Electricity() { static const FGameplayTag& Tag = WW_Internal::Economy_Resource_Electricity; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Resource_Water() { static const FGameplayTag& Tag = WW_Internal::Economy_Resource_Water; return Tag; }
+const FGameplayTag& FWWTagLibrary::Economy_Resource_Gas() { static const FGameplayTag& Tag = WW_Internal::Economy_Resource_Gas; return Tag; }
+const FGameplayTag& FWWTagLibrary::Debug_Economy() { static const FGameplayTag& Tag = WW_Internal::Debug_Economy; return Tag; }
