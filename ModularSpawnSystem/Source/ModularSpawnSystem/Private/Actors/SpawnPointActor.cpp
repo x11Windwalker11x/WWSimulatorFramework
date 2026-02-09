@@ -5,6 +5,11 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogSpawnPoint, Log, All);
+
+DECLARE_STATS_GROUP(TEXT("SpawnManager"), STATGROUP_SpawnManagerPoint, STATCAT_Advanced);
+DECLARE_CYCLE_STAT(TEXT("TryRespawn"), STAT_SpawnPoint_TryRespawn, STATGROUP_SpawnManagerPoint);
+
 ASpawnPointActor::ASpawnPointActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -23,6 +28,15 @@ void ASpawnPointActor::BeginPlay()
 	{
 		SpawnActors();
 	}
+}
+
+void ASpawnPointActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 void ASpawnPointActor::SpawnActors()
@@ -101,21 +115,32 @@ void ASpawnPointActor::OnSpawnedActorDestroyed(AActor* DestroyedActor)
 		return !Ref.IsValid() || Ref.Get() == DestroyedActor;
 	});
 
-	// Schedule respawn if configured
+	// Schedule respawn if configured - guard against overwriting pending timer
 	if (Config.RespawnDelay > 0.f && HasAuthority() && GetWorld())
 	{
-		GetWorld()->GetTimerManager().SetTimer(
-			RespawnTimerHandle, this,
-			&ASpawnPointActor::TryRespawn,
-			Config.RespawnDelay, false
-		);
+		PendingRespawnCount++;
+
+		if (!GetWorld()->GetTimerManager().IsTimerActive(RespawnTimerHandle))
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				RespawnTimerHandle, this,
+				&ASpawnPointActor::TryRespawn,
+				Config.RespawnDelay, false
+			);
+		}
 	}
 }
 
 void ASpawnPointActor::TryRespawn()
 {
+	SCOPE_CYCLE_COUNTER(STAT_SpawnPoint_TryRespawn);
+	const int32 Pending = PendingRespawnCount;
+	PendingRespawnCount = 0;
+
 	if (GetAliveCount() < Config.MaxSimultaneous)
 	{
+		UE_LOG(LogSpawnPoint, Log, TEXT("SpawnPoint [%s]: TryRespawn (Pending=%d, Alive=%d/%d)"),
+			*GetName(), Pending, GetAliveCount(), Config.MaxSimultaneous);
 		SpawnActors();
 	}
 }

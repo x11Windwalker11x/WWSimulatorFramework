@@ -8,6 +8,11 @@
 #include "Components/DurabilityComponent.h"
 #include "Interfaces/ModularInteractionSystem/InteractableInterface.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogSpawnManager, Log, All);
+
+DECLARE_STATS_GROUP(TEXT("SpawnManager"), STATGROUP_SpawnManager, STATCAT_Advanced);
+DECLARE_CYCLE_STAT(TEXT("OnCleanupTimer"), STAT_SpawnManager_OnCleanupTimer, STATGROUP_SpawnManager);
+
 // ============================================================================
 // SUBSYSTEM LIFECYCLE
 // ============================================================================
@@ -15,7 +20,7 @@
 void UUniversalSpawnManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	UE_LOG(LogTemp, Log, TEXT("UniversalSpawnManager initialized"));
+	UE_LOG(LogSpawnManager, Log, TEXT("UniversalSpawnManager initialized"));
 }
 
 void UUniversalSpawnManager::Deinitialize()
@@ -29,7 +34,7 @@ void UUniversalSpawnManager::Deinitialize()
 	ActorPools.Empty();
 	ActorsToCleanup.Empty();
 	
-	UE_LOG(LogTemp, Log, TEXT("UniversalSpawnManager deinitialized"));
+	UE_LOG(LogSpawnManager, Log, TEXT("UniversalSpawnManager deinitialized"));
 	Super::Deinitialize();
 }
 
@@ -83,26 +88,26 @@ AActor* UUniversalSpawnManager::SpawnActor(
 	// Server authority check
 	if (!IsServer())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SpawnActor called on client - ignored"));
+		UE_LOG(LogSpawnManager, Warning, TEXT("SpawnActor called on client - ignored"));
 		return nullptr;
 	}
 
 	if (!GetWorld())
 	{
-		UE_LOG(LogTemp, Error, TEXT("SpawnActor - No valid world"));
+		UE_LOG(LogSpawnManager, Error, TEXT("SpawnActor - No valid world"));
 		return nullptr;
 	}
 	
 	if (!ActorClass.IsValid() && !ActorClass.LoadSynchronous())
 	{
-		UE_LOG(LogTemp, Error, TEXT("SpawnActor - Invalid ActorClass"));
+		UE_LOG(LogSpawnManager, Error, TEXT("SpawnActor - Invalid ActorClass"));
 		return nullptr;
 	}
 	
 	UClass* LoadedClass = ActorClass.LoadSynchronous();
 	if (!LoadedClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("SpawnActor - Failed to load class"));
+		UE_LOG(LogSpawnManager, Error, TEXT("SpawnActor - Failed to load class"));
 		return nullptr;
 	}
 	
@@ -127,7 +132,7 @@ AActor* UUniversalSpawnManager::SpawnActor(
 	
 	if (!SpawnedActor)
 	{
-		UE_LOG(LogTemp, Error, TEXT("SpawnActor - Failed to spawn actor"));
+		UE_LOG(LogSpawnManager, Error, TEXT("SpawnActor - Failed to spawn actor"));
 		return nullptr;
 	}
 	
@@ -149,7 +154,7 @@ AActor* UUniversalSpawnManager::SpawnActor(
 		Stats.PeakActive = Stats.ActiveCount;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Spawned actor [%s] at %s"),
+	UE_LOG(LogSpawnManager, Log, TEXT("Spawned actor [%s] at %s"),
 		*LoadedClass->GetName(), *Location.ToString());
 	
 	if (SpawnedActor)
@@ -174,7 +179,7 @@ AActor* UUniversalSpawnManager::SpawnActorAtCameraForward(
 {
 	if (!OwnerPawn)
 	{
-		UE_LOG(LogTemp, Error, TEXT("SpawnActorAtCameraForward - OwnerPawn is null"));
+		UE_LOG(LogSpawnManager, Error, TEXT("SpawnActorAtCameraForward - OwnerPawn is null"));
 		return nullptr;
 	}
 	
@@ -243,7 +248,7 @@ void UUniversalSpawnManager::ReturnActorToPool(AActor* Actor)
 		OnActorDespawned.Broadcast(Actor, false);
 		OnPoolExhausted.Broadcast(ActorClass->GetFName());
 		Actor->Destroy();
-		UE_LOG(LogTemp, Log, TEXT("Pool full for %s, destroyed actor"), *ActorClass->GetName());
+		UE_LOG(LogSpawnManager, Log, TEXT("Pool full for %s, destroyed actor"), *ActorClass->GetName());
 		return;
 	}
 	
@@ -259,7 +264,7 @@ void UUniversalSpawnManager::ReturnActorToPool(AActor* Actor)
 	
 	OnActorDespawned.Broadcast(Actor, true);
 
-	UE_LOG(LogTemp, Log, TEXT("Returned %s to pool (Size: %d/%d)"),
+	UE_LOG(LogSpawnManager, Log, TEXT("Returned %s to pool (Size: %d/%d)"),
 		*ActorClass->GetName(), ClassPool.Num(), MaxActorsPerClassInPool);
 }
 
@@ -297,7 +302,7 @@ void UUniversalSpawnManager::PrewarmPool(TSubclassOf<AActor> ActorClass, int32 C
 		}
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Prewarmed pool for %s with %d actors (Total: %d)"),
+	UE_LOG(LogSpawnManager, Log, TEXT("Prewarmed pool for %s with %d actors (Total: %d)"),
 		*ClassPtr->GetName(), SpawnCount, ClassPool.Num());
 }
 
@@ -337,17 +342,17 @@ FPoolStats UUniversalSpawnManager::GetPoolStats(TSubclassOf<AActor> ActorClass) 
 
 void UUniversalSpawnManager::LogAllPoolStats() const
 {
-	UE_LOG(LogTemp, Log, TEXT("=== Pool Stats ==="));
+	UE_LOG(LogSpawnManager, Log, TEXT("=== Pool Stats ==="));
 	for (const auto& Pair : PoolStatsMap)
 	{
 		if (Pair.Key)
 		{
 			FPoolStats Stats = GetPoolStats(Pair.Key);
-			UE_LOG(LogTemp, Log, TEXT("  %s: Spawned=%d Active=%d Pooled=%d Peak=%d"),
+			UE_LOG(LogSpawnManager, Log, TEXT("  %s: Spawned=%d Active=%d Pooled=%d Peak=%d"),
 				*Pair.Key->GetName(), Stats.TotalSpawned, Stats.ActiveCount, Stats.PooledCount, Stats.PeakActive);
 		}
 	}
-	UE_LOG(LogTemp, Log, TEXT("=================="));
+	UE_LOG(LogSpawnManager, Log, TEXT("=================="));
 }
 
 // ============================================================================
@@ -395,7 +400,7 @@ AActor* UUniversalSpawnManager::SpawnAI(TSoftClassPtr<AActor> ActorClass, FVecto
 	FVector SpawnLocation;
 	if (!USpawnHelpers::FindValidSpawnLocation(this, Origin, SearchRadius, SpawnLocation))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("SpawnAI - No valid navmesh location near %s"), *Origin.ToString());
+		UE_LOG(LogSpawnManager, Warning, TEXT("SpawnAI - No valid navmesh location near %s"), *Origin.ToString());
 		return nullptr;
 	}
 
@@ -523,7 +528,7 @@ AActor* UUniversalSpawnManager::GetFromPoolOrSpawn(
 			PoolData.Actor->SetActorHiddenInGame(false);
 			PoolData.Actor->SetActorEnableCollision(true);
             
-			UE_LOG(LogTemp, Log, TEXT("Reused %s from pool"), *ActorClass->GetName());
+			UE_LOG(LogSpawnManager, Log, TEXT("Reused %s from pool"), *ActorClass->GetName());
 			return PoolData.Actor;
 		}
 	}
@@ -541,7 +546,7 @@ AActor* UUniversalSpawnManager::GetFromPoolOrSpawn(
 	
 	if (NewActor)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Created new %s (pool was empty)"), *ActorClass->GetName());
+		UE_LOG(LogSpawnManager, Log, TEXT("Created new %s (pool was empty)"), *ActorClass->GetName());
 	}
 	
 	return NewActor;
@@ -567,7 +572,7 @@ void UUniversalSpawnManager::InitializeActor(AActor* Actor, FName ItemID, int32 
 		{
 			// TODO: Add item to inventory component
 			// You'll need to cast to UInventoryComponent and call AddItem()
-			UE_LOG(LogTemp, Log, TEXT("Actor has inventory - TODO: Add ItemID %s x%d"), 
+			UE_LOG(LogSpawnManager, Log, TEXT("Actor has inventory - TODO: Add ItemID %s x%d"), 
 				*ItemID.ToString(), Quantity);
 		}
 		//Try getting Durability Component, try updating durability if valid.
@@ -629,26 +634,22 @@ void UUniversalSpawnManager::DeactivateActor(AActor* Actor)
 
 void UUniversalSpawnManager::OnCleanupTimer()
 {
+	SCOPE_CYCLE_COUNTER(STAT_SpawnManager_OnCleanupTimer);
 	int32 RemovedCount = 0;
 
-	// Process lifetime-based cleanup
+	// Process lifetime-based cleanup: act on expired entries, then batch-remove
 	if (GetWorld())
 	{
 		const float CurrentTime = GetWorld()->GetTimeSeconds();
 
-		for (int32 i = ActorsToCleanup.Num() - 1; i >= 0; --i)
+		// First pass: process expired/invalid entries (side effects)
+		for (FActorCleanupData& CleanupData : ActorsToCleanup)
 		{
-			FActorCleanupData& CleanupData = ActorsToCleanup[i];
-
-			// Remove invalid entries
 			if (!CleanupData.Actor || !IsValid(CleanupData.Actor))
 			{
-				ActorsToCleanup.RemoveAt(i);
-				RemovedCount++;
-				continue;
+				continue; // Will be removed in batch below
 			}
 
-			// Check if lifetime expired
 			if (CurrentTime >= CleanupData.CleanupTime)
 			{
 				if (CleanupData.bReturnToPool)
@@ -661,41 +662,43 @@ void UUniversalSpawnManager::OnCleanupTimer()
 					OnActorDespawned.Broadcast(CleanupData.Actor, false);
 					CleanupData.Actor->Destroy();
 				}
-
-				ActorsToCleanup.RemoveAt(i);
-				RemovedCount++;
 			}
 		}
-	}
 
-	// Clean up invalid active actors
-	for (int32 i = ActiveActors.Num() - 1; i >= 0; --i)
-	{
-		if (!ActiveActors[i] || !IsValid(ActiveActors[i]))
+		// Batch-remove invalid and expired entries (single compaction pass)
+		const int32 BeforeCount = ActorsToCleanup.Num();
+		ActorsToCleanup.RemoveAll([CurrentTime](const FActorCleanupData& Data)
 		{
-			ActiveActors.RemoveAt(i);
-			RemovedCount++;
-		}
+			return !Data.Actor || !IsValid(Data.Actor) || CurrentTime >= Data.CleanupTime;
+		});
+		RemovedCount += BeforeCount - ActorsToCleanup.Num();
 	}
 
-	// Clean up invalid pooled actors
+	// Clean up invalid active actors (batch removal, order doesn't matter)
+	{
+		const int32 BeforeCount = ActiveActors.Num();
+		ActiveActors.RemoveAll([](const TObjectPtr<AActor>& Actor)
+		{
+			return !Actor || !IsValid(Actor);
+		});
+		RemovedCount += BeforeCount - ActiveActors.Num();
+	}
+
+	// Clean up invalid pooled actors (batch removal per pool)
 	for (auto& PoolPair : ActorPools)
 	{
 		TArray<FPooledActorData>& ClassPool = PoolPair.Value.PooledActors;
-
-		for (int32 i = ClassPool.Num() - 1; i >= 0; --i)
+		const int32 BeforeCount = ClassPool.Num();
+		ClassPool.RemoveAll([](const FPooledActorData& Data)
 		{
-			if (!ClassPool[i].Actor || !IsValid(ClassPool[i].Actor))
-			{
-				ClassPool.RemoveAt(i);
-				RemovedCount++;
-			}
-		}
+			return !Data.Actor || !IsValid(Data.Actor);
+		});
+		RemovedCount += BeforeCount - ClassPool.Num();
 	}
 
 	if (RemovedCount > 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Cleanup removed %d invalid actors"), RemovedCount);
+		UE_LOG(LogSpawnManager, Log, TEXT("Cleanup removed %d invalid actors"), RemovedCount);
 	}
 }
 

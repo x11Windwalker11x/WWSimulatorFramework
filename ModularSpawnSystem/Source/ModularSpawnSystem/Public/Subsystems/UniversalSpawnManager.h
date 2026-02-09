@@ -280,7 +280,7 @@ protected:
 	int32 MaxActorsPerClassInPool = 50;
 
 	/** Auto-cleanup interval (seconds) */
-	UPROPERTY(EditDefaultsOnly, Category = "Spawn Manager|Config")
+	UPROPERTY(EditDefaultsOnly, Category = "Spawn Manager|Config", meta = (ClampMin = "1.0", ClampMax = "60.0"))
 	float CleanupInterval = 5.f;
 
 	// ============================================================================

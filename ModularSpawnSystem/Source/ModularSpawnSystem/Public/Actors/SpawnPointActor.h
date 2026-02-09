@@ -53,6 +53,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/** Track spawned actors */
 	UPROPERTY()
@@ -60,6 +61,9 @@ protected:
 
 	/** Respawn timer handle */
 	FTimerHandle RespawnTimerHandle;
+
+	/** Number of pending respawns (for logging/debugging) */
+	int32 PendingRespawnCount = 0;
 
 	/** Called when a spawned actor is destroyed */
 	UFUNCTION()

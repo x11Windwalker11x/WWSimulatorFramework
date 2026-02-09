@@ -9,6 +9,8 @@
 #include "Net/UnrealNetwork.h"
 #include "WaveSpawnerComponent.generated.h"
 
+class UUniversalSpawnManager;
+
 /**
  * Wave Spawner Component
  * Attach to any actor to enable timed wave spawning.
@@ -72,6 +74,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** Current wave index */
@@ -84,6 +87,9 @@ protected:
 	/** Is currently spawning */
 	UPROPERTY(Replicated)
 	bool bIsSpawning = false;
+
+	/** Cached spawn manager reference (Rule #41) */
+	TWeakObjectPtr<UUniversalSpawnManager> CachedSpawnManager;
 
 	/** Timer for individual spawn ticks within a wave */
 	FTimerHandle SpawnTickHandle;

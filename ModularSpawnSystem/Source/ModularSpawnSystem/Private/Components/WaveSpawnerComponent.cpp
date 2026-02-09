@@ -6,6 +6,11 @@
 #include "TimerManager.h"
 #include "Net/UnrealNetwork.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogWaveSpawner, Log, All);
+
+DECLARE_STATS_GROUP(TEXT("SpawnManager"), STATGROUP_SpawnManagerWave, STATCAT_Advanced);
+DECLARE_CYCLE_STAT(TEXT("SpawnNextInWave"), STAT_WaveSpawner_SpawnNextInWave, STATGROUP_SpawnManagerWave);
+
 UWaveSpawnerComponent::UWaveSpawnerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -16,10 +21,18 @@ void UWaveSpawnerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CachedSpawnManager = UUniversalSpawnManager::Get(this);
+
 	if (bAutoStart && GetOwner() && GetOwner()->HasAuthority())
 	{
 		StartWaves();
 	}
+}
+
+void UWaveSpawnerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	StopWaves();
+	Super::EndPlay(EndPlayReason);
 }
 
 void UWaveSpawnerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -39,7 +52,7 @@ void UWaveSpawnerComponent::StartWaves()
 
 	if (Waves.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WaveSpawner: No waves configured"));
+		UE_LOG(LogWaveSpawner, Warning, TEXT("WaveSpawner: No waves configured"));
 		return;
 	}
 
@@ -63,6 +76,7 @@ void UWaveSpawnerComponent::StopWaves()
 
 void UWaveSpawnerComponent::SpawnNextInWave()
 {
+	SCOPE_CYCLE_COUNTER(STAT_WaveSpawner_SpawnNextInWave);
 	if (!bIsSpawning || !GetOwner() || !GetWorld())
 	{
 		return;
@@ -76,10 +90,16 @@ void UWaveSpawnerComponent::SpawnNextInWave()
 
 	const FWaveConfig& Wave = Waves[CurrentWaveIndex];
 
-	UUniversalSpawnManager* SpawnManager = UUniversalSpawnManager::Get(this);
+	UUniversalSpawnManager* SpawnManager = CachedSpawnManager.Get();
 	if (!SpawnManager)
 	{
-		return;
+		// Re-cache in case subsystem was created after our BeginPlay
+		CachedSpawnManager = UUniversalSpawnManager::Get(this);
+		SpawnManager = CachedSpawnManager.Get();
+		if (!SpawnManager)
+		{
+			return;
+		}
 	}
 
 	// Pick class (cycle through available classes)
@@ -99,7 +119,7 @@ void UWaveSpawnerComponent::SpawnNextInWave()
 	{
 		OnWaveComplete.Broadcast(CurrentWaveIndex, Waves.Num());
 
-		UE_LOG(LogTemp, Log, TEXT("WaveSpawner: Wave %d/%d complete"), CurrentWaveIndex + 1, Waves.Num());
+		UE_LOG(LogWaveSpawner, Log, TEXT("WaveSpawner: Wave %d/%d complete"), CurrentWaveIndex + 1, Waves.Num());
 
 		// Advance to next wave
 		AdvanceWave();
@@ -128,7 +148,7 @@ void UWaveSpawnerComponent::AdvanceWave()
 		else
 		{
 			bIsSpawning = false;
-			UE_LOG(LogTemp, Log, TEXT("WaveSpawner: All waves complete"));
+			UE_LOG(LogWaveSpawner, Log, TEXT("WaveSpawner: All waves complete"));
 			return;
 		}
 	}
