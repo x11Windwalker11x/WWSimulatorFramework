@@ -372,6 +372,12 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Economy_Resource_Water, "Economy.Resource.Water");
     UE_DEFINE_GAMEPLAY_TAG(Economy_Resource_Gas, "Economy.Resource.Gas");
     UE_DEFINE_GAMEPLAY_TAG(Debug_Economy, "Debug.Economy");
+
+    // UI SELECTION MODE TAGS (Marquee modifier modes)
+    UE_DEFINE_GAMEPLAY_TAG(UI_Selection_Mode_Replace, "UI.Selection.Mode.Replace");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Selection_Mode_Additive, "UI.Selection.Mode.Additive");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Selection_Mode_Toggle, "UI.Selection.Mode.Toggle");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Selection_Mode_Subtractive, "UI.Selection.Mode.Subtractive");
 }
 
 // Implement public accessor functions
@@ -1705,3 +1711,9 @@ const FGameplayTag& FWWTagLibrary::Quest_Event_Failed() { static const FGameplay
 const FGameplayTag& FWWTagLibrary::Quest_Event_TurnedIn() { static const FGameplayTag& Tag = WW_Internal::Quest_Event_TurnedIn; return Tag; }
 const FGameplayTag& FWWTagLibrary::Quest_Event_ObjectiveProgress() { static const FGameplayTag& Tag = WW_Internal::Quest_Event_ObjectiveProgress; return Tag; }
 const FGameplayTag& FWWTagLibrary::Debug_Quest() { static const FGameplayTag& Tag = WW_Internal::Debug_Quest; return Tag; }
+
+// UI SELECTION MODE TAGS
+const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Replace() { static const FGameplayTag& Tag = WW_Internal::UI_Selection_Mode_Replace; return Tag; }
+const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Additive() { static const FGameplayTag& Tag = WW_Internal::UI_Selection_Mode_Additive; return Tag; }
+const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Toggle() { static const FGameplayTag& Tag = WW_Internal::UI_Selection_Mode_Toggle; return Tag; }
+const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Subtractive() { static const FGameplayTag& Tag = WW_Internal::UI_Selection_Mode_Subtractive; return Tag; }

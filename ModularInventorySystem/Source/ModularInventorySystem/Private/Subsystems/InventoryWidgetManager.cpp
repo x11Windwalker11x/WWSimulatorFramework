@@ -142,6 +142,49 @@ TArray<FInventorySlotReference> UInventoryWidgetManager::GetSelectedSlots() cons
     return SelectedSlots;
 }
 
+void UInventoryWidgetManager::AddToSelection(FGameplayTag InventoryType, int32 SlotIndex)
+{
+    SelectSlot(InventoryType, SlotIndex);
+}
+
+void UInventoryWidgetManager::RemoveFromSelection(FGameplayTag InventoryType, int32 SlotIndex)
+{
+    DeselectSlot(InventoryType, SlotIndex);
+}
+
+void UInventoryWidgetManager::ToggleSelection(FGameplayTag InventoryType, int32 SlotIndex)
+{
+    ToggleSlotSelection(InventoryType, SlotIndex);
+}
+
+void UInventoryWidgetManager::AddMultipleToSelection(const TArray<FInventorySlotReference>& Slots)
+{
+    bool bChanged = false;
+    for (const FInventorySlotReference& Ref : Slots)
+    {
+        if (!SelectedSlots.Contains(Ref))
+        {
+            SelectedSlots.Add(Ref);
+            bChanged = true;
+        }
+    }
+
+    if (bChanged)
+    {
+        OnSelectionChanged.Broadcast();
+    }
+}
+
+bool UInventoryWidgetManager::CanMultiSelect(FGameplayTag InventoryType) const
+{
+    return !bIsInQuestCombineMode && !bIsInAttachmentMode && !bIsInCompareMode;
+}
+
+bool UInventoryWidgetManager::CanShowContextMenu(FGameplayTag InventoryType) const
+{
+    return !bIsInQuestCombineMode && !bIsInAttachmentMode;
+}
+
 // ============================================================================
 // HELPER WIDGETS
 // ============================================================================

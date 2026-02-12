@@ -825,6 +825,22 @@ public:
 
     /** Debug.Quest - Debug layer for quest system */
     static const FGameplayTag& Debug_Quest();
+
+    // ================================================================
+    // UI SELECTION MODE TAGS (Marquee modifier modes)
+    // ================================================================
+
+    /** UI.Selection.Mode.Replace - Replace current selection (default, no modifier) */
+    static const FGameplayTag& UI_Selection_Mode_Replace();
+
+    /** UI.Selection.Mode.Additive - Add to current selection (Shift) */
+    static const FGameplayTag& UI_Selection_Mode_Additive();
+
+    /** UI.Selection.Mode.Toggle - Toggle individual items (Ctrl) */
+    static const FGameplayTag& UI_Selection_Mode_Toggle();
+
+    /** UI.Selection.Mode.Subtractive - Remove from selection (Shift+Ctrl) */
+    static const FGameplayTag& UI_Selection_Mode_Subtractive();
 };
 
 

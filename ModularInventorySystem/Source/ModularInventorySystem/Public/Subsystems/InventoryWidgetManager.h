@@ -92,6 +92,30 @@ public:
     UFUNCTION(BlueprintPure, Category = "Inventory Widget Manager|Selection")
     TArray<FInventorySlotReference> GetSelectedSlots() const;
 
+    /** Add a slot to selection (delegates to SelectSlot) */
+    UFUNCTION(BlueprintCallable, Category = "Inventory Widget Manager|Selection")
+    void AddToSelection(FGameplayTag InventoryType, int32 SlotIndex);
+
+    /** Remove a slot from selection (delegates to DeselectSlot) */
+    UFUNCTION(BlueprintCallable, Category = "Inventory Widget Manager|Selection")
+    void RemoveFromSelection(FGameplayTag InventoryType, int32 SlotIndex);
+
+    /** Toggle selection (delegates to ToggleSlotSelection) */
+    UFUNCTION(BlueprintCallable, Category = "Inventory Widget Manager|Selection")
+    void ToggleSelection(FGameplayTag InventoryType, int32 SlotIndex);
+
+    /** Batch-add multiple slots to selection (single broadcast) */
+    UFUNCTION(BlueprintCallable, Category = "Inventory Widget Manager|Selection")
+    void AddMultipleToSelection(const TArray<FInventorySlotReference>& Slots);
+
+    /** Can multi-select in this inventory? (disabled during special modes) */
+    UFUNCTION(BlueprintPure, Category = "Inventory Widget Manager|Selection")
+    bool CanMultiSelect(FGameplayTag InventoryType) const;
+
+    /** Can show context menu in this inventory? (disabled during special modes) */
+    UFUNCTION(BlueprintPure, Category = "Inventory Widget Manager|Selection")
+    bool CanShowContextMenu(FGameplayTag InventoryType) const;
+
     // ============================================================================
     // HELPER WIDGETS
     // ============================================================================
