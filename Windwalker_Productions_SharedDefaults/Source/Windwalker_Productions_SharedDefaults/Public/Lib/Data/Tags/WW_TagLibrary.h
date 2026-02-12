@@ -771,6 +771,60 @@ public:
 
     /** Economy.Resource.Gas - Gas consumption */
     static const FGameplayTag& Economy_Resource_Gas();
+
+    // ================================================================
+    // QUEST SYSTEM TAGS
+    // ================================================================
+
+    /** Quest.State.Unavailable - Quest not yet available */
+    static const FGameplayTag& Quest_State_Unavailable();
+    /** Quest.State.Available - Quest can be accepted */
+    static const FGameplayTag& Quest_State_Available();
+    /** Quest.State.Active - Quest in progress */
+    static const FGameplayTag& Quest_State_Active();
+    /** Quest.State.Completed - Quest objectives done */
+    static const FGameplayTag& Quest_State_Completed();
+    /** Quest.State.Failed - Quest failed */
+    static const FGameplayTag& Quest_State_Failed();
+    /** Quest.State.TurnedIn - Quest rewards claimed */
+    static const FGameplayTag& Quest_State_TurnedIn();
+
+    /** Quest.Type.Main - Main story quest */
+    static const FGameplayTag& Quest_Type_Main();
+    /** Quest.Type.Side - Side quest */
+    static const FGameplayTag& Quest_Type_Side();
+    /** Quest.Type.Daily - Daily repeatable quest */
+    static const FGameplayTag& Quest_Type_Daily();
+    /** Quest.Type.Bounty - Bounty/hunt quest */
+    static const FGameplayTag& Quest_Type_Bounty();
+
+    /** Quest.Chain.Story - Story quest chain */
+    static const FGameplayTag& Quest_Chain_Story();
+    /** Quest.Chain.Side - Side quest chain */
+    static const FGameplayTag& Quest_Chain_Side();
+
+    /** Quest.Reward.XP - Experience reward */
+    static const FGameplayTag& Quest_Reward_XP();
+    /** Quest.Reward.Currency - Currency reward */
+    static const FGameplayTag& Quest_Reward_Currency();
+    /** Quest.Reward.Item - Item reward */
+    static const FGameplayTag& Quest_Reward_Item();
+    /** Quest.Reward.Reputation - Reputation reward */
+    static const FGameplayTag& Quest_Reward_Reputation();
+
+    /** Quest.Event.Accepted - Quest accepted event */
+    static const FGameplayTag& Quest_Event_Accepted();
+    /** Quest.Event.Completed - Quest completed event */
+    static const FGameplayTag& Quest_Event_Completed();
+    /** Quest.Event.Failed - Quest failed event */
+    static const FGameplayTag& Quest_Event_Failed();
+    /** Quest.Event.TurnedIn - Quest turned in event */
+    static const FGameplayTag& Quest_Event_TurnedIn();
+    /** Quest.Event.ObjectiveProgress - Quest objective progressed */
+    static const FGameplayTag& Quest_Event_ObjectiveProgress();
+
+    /** Debug.Quest - Debug layer for quest system */
+    static const FGameplayTag& Debug_Quest();
 };
 
 

@@ -336,6 +336,30 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Spawn_Cleanup_Lifetime, "Spawn.Cleanup.Lifetime");
     UE_DEFINE_GAMEPLAY_TAG(Spawn_Cleanup_Immediate, "Spawn.Cleanup.Immediate");
 
+    // QUEST SYSTEM TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Quest_State_Unavailable, "Quest.State.Unavailable");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_State_Available, "Quest.State.Available");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_State_Active, "Quest.State.Active");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_State_Completed, "Quest.State.Completed");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_State_Failed, "Quest.State.Failed");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_State_TurnedIn, "Quest.State.TurnedIn");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Type_Main, "Quest.Type.Main");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Type_Side, "Quest.Type.Side");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Type_Daily, "Quest.Type.Daily");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Type_Bounty, "Quest.Type.Bounty");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Chain_Story, "Quest.Chain.Story");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Chain_Side, "Quest.Chain.Side");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Reward_XP, "Quest.Reward.XP");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Reward_Currency, "Quest.Reward.Currency");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Reward_Item, "Quest.Reward.Item");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Reward_Reputation, "Quest.Reward.Reputation");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Event_Accepted, "Quest.Event.Accepted");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Event_Completed, "Quest.Event.Completed");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Event_Failed, "Quest.Event.Failed");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Event_TurnedIn, "Quest.Event.TurnedIn");
+    UE_DEFINE_GAMEPLAY_TAG(Quest_Event_ObjectiveProgress, "Quest.Event.ObjectiveProgress");
+    UE_DEFINE_GAMEPLAY_TAG(Debug_Quest, "Debug.Quest");
+
     // ECONOMY TAGS
     UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Utility, "Economy.Category.Utility");
     UE_DEFINE_GAMEPLAY_TAG(Economy_Category_Wages, "Economy.Category.Wages");
@@ -1657,3 +1681,27 @@ const FGameplayTag& FWWTagLibrary::Economy_Resource_Electricity() { static const
 const FGameplayTag& FWWTagLibrary::Economy_Resource_Water() { static const FGameplayTag& Tag = WW_Internal::Economy_Resource_Water; return Tag; }
 const FGameplayTag& FWWTagLibrary::Economy_Resource_Gas() { static const FGameplayTag& Tag = WW_Internal::Economy_Resource_Gas; return Tag; }
 const FGameplayTag& FWWTagLibrary::Debug_Economy() { static const FGameplayTag& Tag = WW_Internal::Debug_Economy; return Tag; }
+
+// QUEST SYSTEM TAGS
+const FGameplayTag& FWWTagLibrary::Quest_State_Unavailable() { static const FGameplayTag& Tag = WW_Internal::Quest_State_Unavailable; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_State_Available() { static const FGameplayTag& Tag = WW_Internal::Quest_State_Available; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_State_Active() { static const FGameplayTag& Tag = WW_Internal::Quest_State_Active; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_State_Completed() { static const FGameplayTag& Tag = WW_Internal::Quest_State_Completed; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_State_Failed() { static const FGameplayTag& Tag = WW_Internal::Quest_State_Failed; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_State_TurnedIn() { static const FGameplayTag& Tag = WW_Internal::Quest_State_TurnedIn; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Type_Main() { static const FGameplayTag& Tag = WW_Internal::Quest_Type_Main; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Type_Side() { static const FGameplayTag& Tag = WW_Internal::Quest_Type_Side; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Type_Daily() { static const FGameplayTag& Tag = WW_Internal::Quest_Type_Daily; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Type_Bounty() { static const FGameplayTag& Tag = WW_Internal::Quest_Type_Bounty; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Chain_Story() { static const FGameplayTag& Tag = WW_Internal::Quest_Chain_Story; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Chain_Side() { static const FGameplayTag& Tag = WW_Internal::Quest_Chain_Side; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Reward_XP() { static const FGameplayTag& Tag = WW_Internal::Quest_Reward_XP; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Reward_Currency() { static const FGameplayTag& Tag = WW_Internal::Quest_Reward_Currency; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Reward_Item() { static const FGameplayTag& Tag = WW_Internal::Quest_Reward_Item; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Reward_Reputation() { static const FGameplayTag& Tag = WW_Internal::Quest_Reward_Reputation; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Event_Accepted() { static const FGameplayTag& Tag = WW_Internal::Quest_Event_Accepted; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Event_Completed() { static const FGameplayTag& Tag = WW_Internal::Quest_Event_Completed; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Event_Failed() { static const FGameplayTag& Tag = WW_Internal::Quest_Event_Failed; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Event_TurnedIn() { static const FGameplayTag& Tag = WW_Internal::Quest_Event_TurnedIn; return Tag; }
+const FGameplayTag& FWWTagLibrary::Quest_Event_ObjectiveProgress() { static const FGameplayTag& Tag = WW_Internal::Quest_Event_ObjectiveProgress; return Tag; }
+const FGameplayTag& FWWTagLibrary::Debug_Quest() { static const FGameplayTag& Tag = WW_Internal::Debug_Quest; return Tag; }
