@@ -12,7 +12,7 @@
  * Based on Epic's official UMG Drag & Drop tutorial pattern
  */
 UCLASS()
-class ADVANCEDWIDGETFRAMEWORK_API UAWF_DragDropOperation : public UDragDropOperation
+class MODULARINVENTORYSYSTEM_API UAWF_DragDropOperation : public UDragDropOperation
 {
 	GENERATED_BODY()
 
@@ -20,24 +20,8 @@ public:
 	/** Reference to the widget being dragged */
 	UPROPERTY(BlueprintReadWrite, Category = "Drag Drop")
 	UUserWidget* WidgetReference = nullptr;
-    
+
 	/** Offset from widget's top-left corner where the user clicked */
 	UPROPERTY(BlueprintReadWrite, Category = "Drag Drop")
 	FVector2D DragOffset = FVector2D::ZeroVector;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

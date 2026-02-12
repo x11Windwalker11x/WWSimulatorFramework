@@ -12,7 +12,7 @@
  * Automatically registers/unregisters with WidgetManager on construct/destruct
  */
 UCLASS(Abstract)
-class ADVANCEDWIDGETFRAMEWORK_API UManagedWidget_Master : public UUserWidget, public IManagedWidgetInterface
+class MODULARSYSTEMSBASE_API UManagedWidget_Master : public UUserWidget, public IManagedWidgetInterface
 {
 	GENERATED_BODY()
 

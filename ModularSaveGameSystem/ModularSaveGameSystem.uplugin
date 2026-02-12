@@ -27,10 +27,6 @@
 			"Enabled": true,
 			"LoadingPhase": "PostEngineInit"
 		},
-        {
-              "Name": "AdvancedWidgetFramework",
-              "Enabled": true
-        },
 		{
 			"Name": "ModularInventorySystem",
 			"Type": "Runtime",

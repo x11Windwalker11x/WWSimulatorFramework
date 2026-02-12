@@ -24,8 +24,8 @@ namespace InteractionDefaultsConstants
 	static constexpr bool bUseBatchedTraces = true;
 
 	// Widgets
-	inline constexpr const TCHAR* Widget_InteractionPromptPath = TEXT("/AdvancedWidgetFramework/WDGT_DefaultInteractionPrompt.WDGT_DefaultInteractionPrompt_C");
-	inline constexpr const TCHAR* Widget_PreInteractionPromptPath = TEXT("/AdvancedWidgetFramework/WDGT_DefaultPreInteractionPrompt.WDGT_DefaultPreInteractionPrompt_C");
+	inline constexpr const TCHAR* Widget_InteractionPromptPath = TEXT("/ModularInteractionSystem/WDGT_DefaultInteractionPrompt.WDGT_DefaultInteractionPrompt_C");
+	inline constexpr const TCHAR* Widget_PreInteractionPromptPath = TEXT("/ModularInteractionSystem/WDGT_DefaultPreInteractionPrompt.WDGT_DefaultPreInteractionPrompt_C");
     extern WINDWALKER_PRODUCTIONS_SHAREDDEFAULTS_API const FText Widget_DefaultInteractionText;
 	extern WINDWALKER_PRODUCTIONS_SHAREDDEFAULTS_API const FColor Widget_DefaultPreInteractionColor;
 	static constexpr  float Widget_DefaultPreInteractionDotsize = 1.0f;

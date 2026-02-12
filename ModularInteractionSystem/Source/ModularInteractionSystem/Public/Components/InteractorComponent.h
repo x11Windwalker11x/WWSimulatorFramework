@@ -10,7 +10,7 @@
 #include "Interface/InteractionSystem/InteractableInterface.h"
 #include "Logging/InteractableInventoryLogging.h"
 #include "Debug/DebugSubsystem.h"
-#include "Interaction/Widget_InteractionPrompt.h"
+#include "UI/Widget_InteractionPrompt.h"
 #include "Interfaces/SimulatorFramework/PhysicalInteractionInterface.h"
 #include "InteractionSystem/InteractionDefaultsConstants.h"
 

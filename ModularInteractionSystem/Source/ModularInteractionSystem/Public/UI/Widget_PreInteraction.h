@@ -6,7 +6,7 @@
 #include "Widget_PreInteraction.generated.h"
 
 UCLASS()
-class ADVANCEDWIDGETFRAMEWORK_API UWidget_PreInteraction : public UUserWidget
+class MODULARINTERACTIONSYSTEM_API UWidget_PreInteraction : public UUserWidget
 {
 	GENERATED_BODY()
 

@@ -1,4 +1,4 @@
-#include "Interaction/Widget_InteractionPrompt.h"
+#include "UI/Widget_InteractionPrompt.h"
 
 #include "Logging/InteractableInventoryLogging.h"
 
@@ -6,11 +6,11 @@ void UWidget_InteractionPrompt::NativeConstruct()
 {
     Super::NativeConstruct();
     bIsValidWidget = true;
-	
-    // ✅ Force visibility to Visible when created
+
+    // Force visibility to Visible when created
     SetVisibility(ESlateVisibility::Visible);
-	
-    UE_LOG(LogDebugSystem, Log, TEXT("🟢 Widget_InteractionPrompt NativeConstruct called"));
+
+    UE_LOG(LogDebugSystem, Log, TEXT("Widget_InteractionPrompt NativeConstruct called"));
 }
 
 

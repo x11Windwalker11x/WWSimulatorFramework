@@ -20,7 +20,7 @@ class UVerticalBox;
  * Displays FItemPreviewData - extend in MIS for type-specific layouts
  */
 UCLASS(Abstract)
-class ADVANCEDWIDGETFRAMEWORK_API UItemPreviewWidget_Base : public UManagedWidget_Master
+class MODULARINVENTORYSYSTEM_API UItemPreviewWidget_Base : public UManagedWidget_Master
 {
     GENERATED_BODY()
 

@@ -28,19 +28,11 @@
 			"Enabled": true,
 			"LoadingPhase": "PostEngineInit"
 		},
-      {
-        "Name": "AdvancedWidgetFramework",
-        "Enabled": true
-      },
         {
           "Name": "ModularSaveGameSystem",
           "Type": "Runtime",
           "Enabled": true,
           "LoadingPhase": "Default"
-        },
-        {
-          "Name": "AdvancedWidgetFramework",
-          "Enabled": true
         },
 		{
 			"Name": "ModularInventorySystem",

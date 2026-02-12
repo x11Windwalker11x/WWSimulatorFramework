@@ -7,34 +7,37 @@ public class ModularSystemsBase : ModuleRules
 	public ModularSystemsBase(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
+
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
 			}
 			);
-				
-		
+
+
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				// ... add other private include paths required here ...
 			}
 			);
-			
-		
+
+
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core", 
+				"Core",
 				"GameplayTags",
 				"NavigationSystem",
+				"UMG",
+				"Slate",
+				"SlateCore",
 				"Windwalker_Productions_SharedDefaults" // Contains Data, Structs and Delegates...
 
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
-			
-		
+
+
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -43,12 +46,12 @@ public class ModularSystemsBase : ModuleRules
 				"Engine",
 				"GameplayTags",
 				"Windwalker_Productions_SharedDefaults" // Contains Data, Structs and Delegates...
-				
-				// ... add private dependencies that you statically link with here ...	
+
+				// ... add private dependencies that you statically link with here ...
 			}
 			);
-		
-		
+
+
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{

@@ -29,10 +29,6 @@
       {
         "Name": "ModularSystemsBase",
         "Enabled": true
-      },
-        {
-          "Name": "AdvancedWidgetFramework",
-          "Enabled": true
-        }
+      }
 	]
 }

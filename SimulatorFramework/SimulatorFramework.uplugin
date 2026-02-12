@@ -23,10 +23,6 @@
 	],
 	"Plugins": [
 		{
-			"Name": "AdvancedWidgetFramework",
-			"Enabled": true
-		},
-		{
 			"Name": "Windwalker_Productions_SharedDefaults",
 			"Enabled": true
 		},

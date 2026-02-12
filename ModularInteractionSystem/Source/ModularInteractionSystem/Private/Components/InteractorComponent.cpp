@@ -7,7 +7,7 @@
 #include "Interface/InteractionSystem/InteractorInterface.h"
 #include "Windwalker_Productions_SharedDefaults.h"
 #include "GenericPlatform/GenericPlatformChunkInstall.h"
-#include "Interaction/Widget_PreInteraction.h"
+#include "UI/Widget_PreInteraction.h"
 #include "Interfaces/IPluginManager.h"
 #include "Interfaces/ModularInteractionSystem/InteractorInterface.h"
 

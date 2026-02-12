@@ -11,7 +11,7 @@
  * Shows a semi-transparent cyan rectangle during drag-to-select
  */
 UCLASS()
-class ADVANCEDWIDGETFRAMEWORK_API UBoxSelectionWidget : public UUserWidget
+class MODULARINVENTORYSYSTEM_API UBoxSelectionWidget : public UUserWidget
 {
 	GENERATED_BODY()
 

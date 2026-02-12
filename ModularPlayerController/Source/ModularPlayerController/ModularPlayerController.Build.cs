@@ -16,9 +16,6 @@ public class ModularPlayerController : ModuleRules
                 Path.Combine(ModuleDirectory, "Public"),
                 Path.Combine(ModuleDirectory, "../../../Windwalker_Productions_SharedDefaults/Source/Windwalker_Productions_SharedDefaults/Public"),
                 Path.Combine(ModuleDirectory, "Public"),
-                Path.Combine(ModuleDirectory, "../../../AdvancedWidgetFramework/Source/AdvancedWidgetFramework/Public"),
-                Path.Combine(ModuleDirectory, "Public")
-
                 //Path.Combine(ModuleDirectory, "Public/Interface")
                     
                 
@@ -53,7 +50,6 @@ public class ModularPlayerController : ModuleRules
             "ModularInventorySystem",
             "ModularInteractionSystem",
             "ModularCheatManager",
-            "AdvancedWidgetFramework",
             "ModularSaveGameSystem",
             "ModularSpawnSystem" 
         });
