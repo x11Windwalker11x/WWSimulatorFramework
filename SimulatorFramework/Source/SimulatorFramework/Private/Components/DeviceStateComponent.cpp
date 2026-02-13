@@ -1,6 +1,8 @@
 #include "Components/DeviceStateComponent.h"
 #include "Components/DurabilityComponent.h"
 #include "Lib/Data/Tags/WW_TagLibrary.h"
+#include "Subsystems/SaveSystem/SaveableRegistrySubsystem.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "Net/UnrealNetwork.h"
 
 UDeviceStateComponent::UDeviceStateComponent()
@@ -37,6 +39,20 @@ void UDeviceStateComponent::BeginPlay()
         PrimaryComponentTick.bCanEverTick = true;
         SetComponentTickEnabled(true);
     }
+
+    if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+    {
+        Registry->RegisterSaveable(this);
+    }
+}
+
+void UDeviceStateComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+    {
+        Registry->UnregisterSaveable(GetSaveID_Implementation());
+    }
+    Super::EndPlay(EndPlayReason);
 }
 
 void UDeviceStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -295,25 +311,27 @@ void UDeviceStateComponent::Server_PerformMaintenance_Implementation()
 void UDeviceStateComponent::Internal_SetState(FGameplayTag NewState)
 {
     if (CurrentState == NewState) return;
-    
+
     FGameplayTag OldState = CurrentState;
     CurrentState = NewState;
-    
+
     OnDeviceStateChanged.Broadcast(OldState, NewState);
+    MarkSaveDirty();
 }
 
 void UDeviceStateComponent::Internal_TurnOn()
 {
     if (IsBroken()) return;
-    
+
     bool bWasPoweredOn = bIsPoweredOn;
     bIsPoweredOn = true;
-    
+
     if (bWasPoweredOn != bIsPoweredOn)
     {
         OnDevicePowerChanged.Broadcast(bIsPoweredOn);
+        MarkSaveDirty();
     }
-    
+
     // Transition to idle if was off
     if (CurrentState == FWWTagLibrary::Simulator_Device_State_Off() ||
         CurrentState == FWWTagLibrary::Simulator_Device_State_NoPower())
@@ -329,15 +347,16 @@ void UDeviceStateComponent::Internal_TurnOff()
     {
         Internal_StopUse(CurrentUser);
     }
-    
+
     bool bWasPoweredOn = bIsPoweredOn;
     bIsPoweredOn = false;
-    
+
     if (bWasPoweredOn != bIsPoweredOn)
     {
         OnDevicePowerChanged.Broadcast(bIsPoweredOn);
+        MarkSaveDirty();
     }
-    
+
     Internal_SetState(FWWTagLibrary::Simulator_Device_State_Off());
 }
 
@@ -440,4 +459,85 @@ void UDeviceStateComponent::OnRep_CurrentState(FGameplayTag OldState)
 void UDeviceStateComponent::OnRep_IsPoweredOn()
 {
     OnDevicePowerChanged.Broadcast(bIsPoweredOn);
+}
+
+// ============================================================================
+// SAVE SYSTEM (ISaveableInterface)
+// ============================================================================
+
+FString UDeviceStateComponent::GetSaveID_Implementation() const
+{
+    if (AActor* Owner = GetOwner())
+    {
+        return FString::Printf(TEXT("%s.%s"), *Owner->GetPathName(), *GetClass()->GetName());
+    }
+    return FString();
+}
+
+int32 UDeviceStateComponent::GetSavePriority_Implementation() const
+{
+    return 115;
+}
+
+FGameplayTag UDeviceStateComponent::GetSaveType_Implementation() const
+{
+    return FWWTagLibrary::Save_Category_Component();
+}
+
+bool UDeviceStateComponent::SaveState_Implementation(FSaveRecord& OutRecord)
+{
+    TArray<uint8> BinaryData;
+    FMemoryWriter MemoryWriter(BinaryData, true);
+    FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
+    Ar.ArIsSaveGame = true;
+    Ar.ArNoDelta = false;
+
+    const_cast<UDeviceStateComponent*>(this)->Serialize(Ar);
+
+    OutRecord.RecordID = FName(*GetSaveID_Implementation());
+    OutRecord.RecordType = FWWTagLibrary::Save_Category_Component();
+    OutRecord.BinaryData = MoveTemp(BinaryData);
+    OutRecord.Timestamp = FDateTime::Now();
+    OutRecord.Priority = GetSavePriority_Implementation();
+
+    return true;
+}
+
+bool UDeviceStateComponent::LoadState_Implementation(const FSaveRecord& InRecord)
+{
+    if (InRecord.BinaryData.Num() == 0)
+    {
+        return false;
+    }
+
+    FMemoryReader MemoryReader(InRecord.BinaryData, true);
+    FObjectAndNameAsStringProxyArchive Ar(MemoryReader, false);
+    Ar.ArIsSaveGame = true;
+
+    Serialize(Ar);
+    OnSaveDataLoaded_Implementation();
+
+    return true;
+}
+
+bool UDeviceStateComponent::IsDirty_Implementation() const
+{
+    return bSaveDirty;
+}
+
+void UDeviceStateComponent::ClearDirty_Implementation()
+{
+    bSaveDirty = false;
+}
+
+void UDeviceStateComponent::OnSaveDataLoaded_Implementation()
+{
+    // Trigger OnRep handlers to update visuals after load
+    OnRep_CurrentState(FGameplayTag());
+    OnRep_IsPoweredOn();
+}
+
+void UDeviceStateComponent::MarkSaveDirty()
+{
+    bSaveDirty = true;
 }

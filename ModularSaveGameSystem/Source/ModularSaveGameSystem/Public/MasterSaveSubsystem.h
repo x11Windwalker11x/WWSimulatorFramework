@@ -7,6 +7,8 @@
 #include "AbilitiesSaveModule.h"
 #include "CharacterSaveModule.h"
 #include "UserSettingsSaveModule.h"
+#include "WorldStateSaveModule.h"
+#include "Delegates/ModularSaveGameSystem/SaveDelegates.h"
 #include "MasterSaveSubsystem.generated.h"
 
 // Delegate declarations
@@ -174,13 +176,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Master Save")
 	void UpdateSaveMetadata(const FString& Description, const FString& LevelName, float PlayTime);
 
+	// ========== World State Save/Load ==========
+
+	/** Save all dirty saveable actors/components in the specified level */
+	UFUNCTION(BlueprintCallable, Category = "Master Save|World State")
+	bool SaveWorldState(const FString& LevelName);
+
+	/** Load and restore all saved actor/component states for the specified level */
+	UFUNCTION(BlueprintCallable, Category = "Master Save|World State")
+	bool LoadWorldState(const FString& LevelName);
+
 	// ========== Events ==========
-	
+
 	UPROPERTY(BlueprintAssignable, Category = "Master Save")
 	FOnMasterSaveComplete OnSaveComplete;
 
 	UPROPERTY(BlueprintAssignable, Category = "Master Save")
 	FOnMasterLoadComplete OnLoadComplete;
+
+	UPROPERTY(BlueprintAssignable, Category = "Master Save|World State")
+	FOnWorldStateLoaded OnWorldStateLoaded;
 
 protected:
 	// Internal save/load operations
@@ -210,4 +225,10 @@ private:
 
 	UPROPERTY(BlueprintCallable, Category = "Master Save")
 	UUserSettingsSaveModule* GetUserSettingsModule();
+
+	/**
+	 * Get world state module (convenience function)
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Master Save")
+	UWorldStateSaveModule* GetWorldStateModule();
 };

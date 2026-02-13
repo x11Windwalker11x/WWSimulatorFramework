@@ -10,6 +10,8 @@
 #include "Lib/Data/Tags/WW_TagLibrary.h"
 #include "Logging/InteractableInventoryLogging.h"
 #include "Utilities/JsonReader/ItemJsonReader.h"
+#include "Subsystems/SaveSystem/SaveableRegistrySubsystem.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 // ============================================================================
 // CONSTRUCTOR & LIFECYCLE
@@ -36,6 +38,20 @@ void UInventoryComponent::BeginPlay()
         
         UE_LOG(LogInventoryInteractableSystem, Log, TEXT("InventoryComponent initialized: %d slots"), MaxInventorySlots);
     }
+
+    if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+    {
+        Registry->RegisterSaveable(this);
+    }
+}
+
+void UInventoryComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+    {
+        Registry->UnregisterSaveable(GetSaveID_Implementation());
+    }
+    Super::EndPlay(EndPlayReason);
 }
 
 void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -126,6 +142,7 @@ void UInventoryComponent::OnRep_Inventory()
 {
     UE_LOG(LogInventoryInteractableSystem, Verbose, TEXT("Client: Inventory replicated"));
     OnInventoryChanged.Broadcast(FWWTagLibrary::Inventory_Type_PlayerInventory());
+    MarkSaveDirty();
 }
 
 // ============================================================================
@@ -717,6 +734,7 @@ bool UInventoryComponent::Internal_AddItem(FName ItemID, int32 Quantity, float Q
         OnItemAdded.Broadcast(ItemID, Slot.Quantity, Slot.InstanceID);
     }
     
+    MarkSaveDirty();
     return RemainingQuantity < Quantity;
 }
 
@@ -736,6 +754,7 @@ bool UInventoryComponent::Internal_RemoveItemByInstance(FGuid InstanceID, int32 
             
             BroadcastSlotChange(FWWTagLibrary::Inventory_Type_PlayerInventory(), i);
             OnItemRemoved.Broadcast(ItemID, RemovedQuantity, InstanceID);
+            MarkSaveDirty();
             return true;
         }
     }
@@ -1571,7 +1590,86 @@ void UInventoryComponent::Client_ConfirmPrediction_Implementation(int32 Predicti
         // Server rejected - rollback to cached state
         RollbackPrediction(PredictionID);
         OnPredictionRejected.Broadcast(PredictionID, FailReason);
-        UE_LOG(LogInventoryInteractableSystem, Warning, 
+        UE_LOG(LogInventoryInteractableSystem, Warning,
                TEXT("Prediction %d rejected: %s"), PredictionID, *FailReason);
     }
+}
+
+// ============================================================================
+// SAVE SYSTEM (ISaveableInterface)
+// ============================================================================
+
+FString UInventoryComponent::GetSaveID_Implementation() const
+{
+    if (AActor* Owner = GetOwner())
+    {
+        return FString::Printf(TEXT("%s.%s"), *Owner->GetPathName(), *GetClass()->GetName());
+    }
+    return FString();
+}
+
+int32 UInventoryComponent::GetSavePriority_Implementation() const
+{
+    return 120;
+}
+
+FGameplayTag UInventoryComponent::GetSaveType_Implementation() const
+{
+    return FWWTagLibrary::Save_Category_Component();
+}
+
+bool UInventoryComponent::SaveState_Implementation(FSaveRecord& OutRecord)
+{
+    TArray<uint8> BinaryData;
+    FMemoryWriter MemoryWriter(BinaryData, true);
+    FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
+    Ar.ArIsSaveGame = true;
+    Ar.ArNoDelta = false;
+
+    const_cast<UInventoryComponent*>(this)->Serialize(Ar);
+
+    OutRecord.RecordID = FName(*GetSaveID_Implementation());
+    OutRecord.RecordType = FWWTagLibrary::Save_Category_Component();
+    OutRecord.BinaryData = MoveTemp(BinaryData);
+    OutRecord.Timestamp = FDateTime::Now();
+    OutRecord.Priority = GetSavePriority_Implementation();
+
+    return true;
+}
+
+bool UInventoryComponent::LoadState_Implementation(const FSaveRecord& InRecord)
+{
+    if (InRecord.BinaryData.Num() == 0)
+    {
+        return false;
+    }
+
+    FMemoryReader MemoryReader(InRecord.BinaryData, true);
+    FObjectAndNameAsStringProxyArchive Ar(MemoryReader, false);
+    Ar.ArIsSaveGame = true;
+
+    Serialize(Ar);
+    OnSaveDataLoaded_Implementation();
+
+    return true;
+}
+
+bool UInventoryComponent::IsDirty_Implementation() const
+{
+    return bSaveDirty;
+}
+
+void UInventoryComponent::ClearDirty_Implementation()
+{
+    bSaveDirty = false;
+}
+
+void UInventoryComponent::OnSaveDataLoaded_Implementation()
+{
+    OnRep_Inventory();
+}
+
+void UInventoryComponent::MarkSaveDirty()
+{
+    bSaveDirty = true;
 }

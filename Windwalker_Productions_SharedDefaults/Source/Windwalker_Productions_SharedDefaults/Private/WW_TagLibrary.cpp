@@ -378,6 +378,14 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(UI_Selection_Mode_Additive, "UI.Selection.Mode.Additive");
     UE_DEFINE_GAMEPLAY_TAG(UI_Selection_Mode_Toggle, "UI.Selection.Mode.Toggle");
     UE_DEFINE_GAMEPLAY_TAG(UI_Selection_Mode_Subtractive, "UI.Selection.Mode.Subtractive");
+
+    // SAVE SYSTEM TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Save_Type_LevelPlaced, "Save.Type.LevelPlaced");
+    UE_DEFINE_GAMEPLAY_TAG(Save_Type_RuntimeSpawned, "Save.Type.RuntimeSpawned");
+    UE_DEFINE_GAMEPLAY_TAG(Save_Type_PlayerData, "Save.Type.PlayerData");
+    UE_DEFINE_GAMEPLAY_TAG(Save_Category_Actor, "Save.Category.Actor");
+    UE_DEFINE_GAMEPLAY_TAG(Save_Category_Component, "Save.Category.Component");
+    UE_DEFINE_GAMEPLAY_TAG(Save_Category_Subsystem, "Save.Category.Subsystem");
 }
 
 // Implement public accessor functions
@@ -1717,3 +1725,11 @@ const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Replace() { static const FG
 const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Additive() { static const FGameplayTag& Tag = WW_Internal::UI_Selection_Mode_Additive; return Tag; }
 const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Toggle() { static const FGameplayTag& Tag = WW_Internal::UI_Selection_Mode_Toggle; return Tag; }
 const FGameplayTag& FWWTagLibrary::UI_Selection_Mode_Subtractive() { static const FGameplayTag& Tag = WW_Internal::UI_Selection_Mode_Subtractive; return Tag; }
+
+// SAVE SYSTEM TAGS
+const FGameplayTag& FWWTagLibrary::Save_Type_LevelPlaced() { static const FGameplayTag& Tag = WW_Internal::Save_Type_LevelPlaced; return Tag; }
+const FGameplayTag& FWWTagLibrary::Save_Type_RuntimeSpawned() { static const FGameplayTag& Tag = WW_Internal::Save_Type_RuntimeSpawned; return Tag; }
+const FGameplayTag& FWWTagLibrary::Save_Type_PlayerData() { static const FGameplayTag& Tag = WW_Internal::Save_Type_PlayerData; return Tag; }
+const FGameplayTag& FWWTagLibrary::Save_Category_Actor() { static const FGameplayTag& Tag = WW_Internal::Save_Category_Actor; return Tag; }
+const FGameplayTag& FWWTagLibrary::Save_Category_Component() { static const FGameplayTag& Tag = WW_Internal::Save_Category_Component; return Tag; }
+const FGameplayTag& FWWTagLibrary::Save_Category_Subsystem() { static const FGameplayTag& Tag = WW_Internal::Save_Category_Subsystem; return Tag; }

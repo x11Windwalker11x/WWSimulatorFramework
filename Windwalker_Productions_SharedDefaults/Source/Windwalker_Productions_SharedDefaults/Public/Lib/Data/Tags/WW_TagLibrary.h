@@ -841,6 +841,28 @@ public:
 
     /** UI.Selection.Mode.Subtractive - Remove from selection (Shift+Ctrl) */
     static const FGameplayTag& UI_Selection_Mode_Subtractive();
+
+    // ================================================================
+    // SAVE SYSTEM TAGS
+    // ================================================================
+
+    /** Save.Type.LevelPlaced - Actor placed in editor (identity via GetPathName) */
+    static const FGameplayTag& Save_Type_LevelPlaced();
+
+    /** Save.Type.RuntimeSpawned - Actor spawned at runtime (identity via FGuid, Phase C) */
+    static const FGameplayTag& Save_Type_RuntimeSpawned();
+
+    /** Save.Type.PlayerData - Player-owned persistent data */
+    static const FGameplayTag& Save_Type_PlayerData();
+
+    /** Save.Category.Actor - Actor-level save record */
+    static const FGameplayTag& Save_Category_Actor();
+
+    /** Save.Category.Component - Component-level save record */
+    static const FGameplayTag& Save_Category_Component();
+
+    /** Save.Category.Subsystem - Subsystem-level save record */
+    static const FGameplayTag& Save_Category_Subsystem();
 };
 
 

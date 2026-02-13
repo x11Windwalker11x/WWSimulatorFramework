@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include "InteractionSystem/InteractionDefaultsConstants.h"
 #include "Debug/DebugSubsystem.h"
+#include "Interfaces/ModularSaveGameSystem/SaveableInterface.h"
 #include "InteractableComponent.generated.h"
 
 class UWidgetManagerBase;
@@ -42,7 +43,7 @@ class UWidgetManagerBase;
  * 5. Implement interaction logic in OnInteract event
  */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class MODULARINTERACTIONSYSTEM_API UInteractableComponent : public USphereComponent
+class MODULARINTERACTIONSYSTEM_API UInteractableComponent : public USphereComponent, public ISaveableInterface
 {
 	GENERATED_BODY()
 
@@ -207,7 +208,7 @@ protected:
 	// ========================================================================
 	
 	/** Can this interactable be used right now? */
-	UPROPERTY(ReplicatedUsing=OnRep_IsEnabled, EditAnywhere, BlueprintReadWrite, Category = "Interactable")
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_IsEnabled, EditAnywhere, BlueprintReadWrite, Category = "Interactable")
 	bool bIsEnabled = true;
 
 	// ========================================================================
@@ -275,4 +276,20 @@ private:
 	/** Cached widget manager reference */
 	UPROPERTY()
 	TObjectPtr<UWidgetManagerBase> CachedWidgetManager = nullptr;
+
+	// ============================================================================
+	// SAVE SYSTEM (ISaveableInterface)
+	// ============================================================================
+
+	virtual FString GetSaveID_Implementation() const override;
+	virtual int32 GetSavePriority_Implementation() const override;
+	virtual FGameplayTag GetSaveType_Implementation() const override;
+	virtual bool SaveState_Implementation(FSaveRecord& OutRecord) override;
+	virtual bool LoadState_Implementation(const FSaveRecord& InRecord) override;
+	virtual bool IsDirty_Implementation() const override;
+	virtual void ClearDirty_Implementation() override;
+	virtual void OnSaveDataLoaded_Implementation() override;
+
+	bool bSaveDirty = false;
+	void MarkSaveDirty();
 };

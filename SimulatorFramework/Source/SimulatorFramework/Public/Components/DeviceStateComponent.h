@@ -4,6 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
 #include "Interfaces/SimulatorFramework/DeviceInterface.h"
+#include "Interfaces/ModularSaveGameSystem/SaveableInterface.h"
 #include "DeviceStateComponent.generated.h"
 
 class UDurabilityComponent;
@@ -16,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeviceMaintenanceRequired);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeviceMaintenanceComplete);
 
 UCLASS(ClassGroup=(SimulatorFramework), meta=(BlueprintSpawnableComponent))
-class SIMULATORFRAMEWORK_API UDeviceStateComponent : public UActorComponent, public IDeviceInterface
+class SIMULATORFRAMEWORK_API UDeviceStateComponent : public UActorComponent, public IDeviceInterface, public ISaveableInterface
 {
     GENERATED_BODY()
 
@@ -24,6 +25,7 @@ public:
     UDeviceStateComponent();
 
     virtual void BeginPlay() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -147,16 +149,16 @@ protected:
     // REPLICATED STATE
     // ============================================================================
 
-    UPROPERTY(ReplicatedUsing = OnRep_CurrentState)
+    UPROPERTY(SaveGame, ReplicatedUsing = OnRep_CurrentState)
     FGameplayTag CurrentState;
 
-    UPROPERTY(ReplicatedUsing = OnRep_IsPoweredOn)
+    UPROPERTY(SaveGame, ReplicatedUsing = OnRep_IsPoweredOn)
     bool bIsPoweredOn = false;
 
     UPROPERTY(Replicated)
     AActor* CurrentUser = nullptr;
 
-    UPROPERTY(Replicated)
+    UPROPERTY(SaveGame, Replicated)
     float TimeSinceLastMaintenance = 0.0f;
 
     UPROPERTY()
@@ -192,4 +194,20 @@ protected:
     void OnDurabilityBroken(AActor* Causer);
     
     void UpdateMaintenanceTimer(float DeltaTime);
+
+    // ============================================================================
+    // SAVE SYSTEM (ISaveableInterface)
+    // ============================================================================
+
+    virtual FString GetSaveID_Implementation() const override;
+    virtual int32 GetSavePriority_Implementation() const override;
+    virtual FGameplayTag GetSaveType_Implementation() const override;
+    virtual bool SaveState_Implementation(FSaveRecord& OutRecord) override;
+    virtual bool LoadState_Implementation(const FSaveRecord& InRecord) override;
+    virtual bool IsDirty_Implementation() const override;
+    virtual void ClearDirty_Implementation() override;
+    virtual void OnSaveDataLoaded_Implementation() override;
+
+    bool bSaveDirty = false;
+    void MarkSaveDirty();
 };

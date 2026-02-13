@@ -12,6 +12,7 @@
 //TODO: engine gets it wrong it should have been ModularInventorySystem instead.
 #include "Windwalker_Productions_SharedDefaults.h"
 #include "ModularInventorySystem/Public/Data/InventoryPrediction.h"
+#include "Interfaces/ModularSaveGameSystem/SaveableInterface.h"
 
 #include "InventoryComponent.generated.h"
 
@@ -46,7 +47,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemConsumed, FName, ItemID, int
  *it is fine for it to inherit from an actor component.
  */
 UCLASS(ClassGroup=(Components), meta=(BlueprintSpawnableComponent))
-class MODULARINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
+class MODULARINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent, public ISaveableInterface
 {
     GENERATED_BODY()
 
@@ -54,6 +55,7 @@ class MODULARINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
 
 protected:
     virtual void BeginPlay() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
     UInventoryComponent();
@@ -325,7 +327,7 @@ protected:
     
     /** Player inventory slots */
     /** It is determined by the tag this component has*/
-    UPROPERTY(ReplicatedUsing=OnRep_Inventory, BlueprintReadOnly, Category = "Inventory")
+    UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Inventory, BlueprintReadOnly, Category = "Inventory")
     TArray<FInventorySlot> Inventory;
     
     // ============================================================================
@@ -420,4 +422,19 @@ protected:
     void Internal_ConsumeItem(const FName& ItemID, int32 Quantity);
     bool Internal_SetSlot(int32 Index, FInventorySlot& Slot);
 
+    // ============================================================================
+    // SAVE SYSTEM (ISaveableInterface)
+    // ============================================================================
+
+    virtual FString GetSaveID_Implementation() const override;
+    virtual int32 GetSavePriority_Implementation() const override;
+    virtual FGameplayTag GetSaveType_Implementation() const override;
+    virtual bool SaveState_Implementation(FSaveRecord& OutRecord) override;
+    virtual bool LoadState_Implementation(const FSaveRecord& InRecord) override;
+    virtual bool IsDirty_Implementation() const override;
+    virtual void ClearDirty_Implementation() override;
+    virtual void OnSaveDataLoaded_Implementation() override;
+
+    bool bSaveDirty = false;
+    void MarkSaveDirty();
 };

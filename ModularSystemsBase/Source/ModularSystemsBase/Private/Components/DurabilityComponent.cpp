@@ -1,6 +1,9 @@
 #include "Components/DurabilityComponent.h"
 #include "GameplayTagAssetInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "Subsystems/SaveSystem/SaveableRegistrySubsystem.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "Lib/Data/Tags/WW_TagLibrary.h"
 
 UDurabilityComponent::UDurabilityComponent()
 {
@@ -16,8 +19,13 @@ UDurabilityComponent::UDurabilityComponent()
 void UDurabilityComponent::BeginPlay()
 {
     Super::BeginPlay();
-    
+
     InitializeDurabilityFromOwner();
+
+    if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+    {
+        Registry->RegisterSaveable(this);
+    }
 }
 
 void UDurabilityComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -255,6 +263,7 @@ void UDurabilityComponent::Internal_ApplyDurabilityLoss(float Amount, AActor* Ca
     float OldDurability = CurrentDurability;
     CurrentDurability = FMath::Max(0.0f, CurrentDurability - Amount);
 
+    MarkSaveDirty();
     OnDurabilityChanged.Broadcast(OldDurability, CurrentDurability, Causer);
 
     CheckBrokenState(Causer);
@@ -267,6 +276,7 @@ void UDurabilityComponent::Internal_Repair(float Amount)
 
     CurrentDurability = FMath::Min(1.0f, CurrentDurability + Amount);
     bIsBroken = false;
+    MarkSaveDirty();
 
     if (!FMath::IsNearlyEqual(OldDurability, CurrentDurability))
     {
@@ -312,7 +322,97 @@ void UDurabilityComponent::OnRep_IsBroken()
 void UDurabilityComponent::CacheTags()
 {
     if (bTagsCached) return;
-    
+
     CachedTag_HasDurability = FGameplayTag::RequestGameplayTag(TEXT("Item.Property.HasDurability"), false);
     bTagsCached = true;
+}
+
+void UDurabilityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+    {
+        Registry->UnregisterSaveable(GetSaveID_Implementation());
+    }
+    Super::EndPlay(EndPlayReason);
+}
+
+// ============================================================================
+// SAVE SYSTEM (ISaveableInterface)
+// ============================================================================
+
+FString UDurabilityComponent::GetSaveID_Implementation() const
+{
+    if (AActor* Owner = GetOwner())
+    {
+        return FString::Printf(TEXT("%s.%s"), *Owner->GetPathName(), *GetClass()->GetName());
+    }
+    return FString();
+}
+
+int32 UDurabilityComponent::GetSavePriority_Implementation() const
+{
+    return 110;
+}
+
+FGameplayTag UDurabilityComponent::GetSaveType_Implementation() const
+{
+    return FWWTagLibrary::Save_Category_Component();
+}
+
+bool UDurabilityComponent::SaveState_Implementation(FSaveRecord& OutRecord)
+{
+    TArray<uint8> BinaryData;
+    FMemoryWriter MemoryWriter(BinaryData, true);
+    FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
+    Ar.ArIsSaveGame = true;
+    Ar.ArNoDelta = false;
+
+    const_cast<UDurabilityComponent*>(this)->Serialize(Ar);
+
+    OutRecord.RecordID = FName(*GetSaveID_Implementation());
+    OutRecord.RecordType = FWWTagLibrary::Save_Category_Component();
+    OutRecord.BinaryData = MoveTemp(BinaryData);
+    OutRecord.Timestamp = FDateTime::Now();
+    OutRecord.Priority = GetSavePriority_Implementation();
+
+    return true;
+}
+
+bool UDurabilityComponent::LoadState_Implementation(const FSaveRecord& InRecord)
+{
+    if (InRecord.BinaryData.Num() == 0)
+    {
+        return false;
+    }
+
+    FMemoryReader MemoryReader(InRecord.BinaryData, true);
+    FObjectAndNameAsStringProxyArchive Ar(MemoryReader, false);
+    Ar.ArIsSaveGame = true;
+
+    Serialize(Ar);
+    OnSaveDataLoaded_Implementation();
+
+    return true;
+}
+
+bool UDurabilityComponent::IsDirty_Implementation() const
+{
+    return bSaveDirty;
+}
+
+void UDurabilityComponent::ClearDirty_Implementation()
+{
+    bSaveDirty = false;
+}
+
+void UDurabilityComponent::OnSaveDataLoaded_Implementation()
+{
+    // Refresh visual state after load
+    OnRep_CurrentDurability();
+    OnRep_IsBroken();
+}
+
+void UDurabilityComponent::MarkSaveDirty()
+{
+    bSaveDirty = true;
 }

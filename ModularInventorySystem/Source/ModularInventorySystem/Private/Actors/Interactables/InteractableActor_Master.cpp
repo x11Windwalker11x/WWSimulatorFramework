@@ -7,6 +7,9 @@
 #include "Interface/InteractionSystem/InteractorInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystems/InventoryWidgetManager.h"
+#include "Subsystems/SaveSystem/SaveableRegistrySubsystem.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "Lib/Data/Tags/WW_TagLibrary.h"
 
 // ============================================================================
 // CONSTRUCTOR
@@ -98,6 +101,12 @@ void AInteractableActor_Master::PostInitializeComponents()
 void AInteractableActor_Master::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Register with save system
+	if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+	{
+		Registry->RegisterSaveable(this);
+	}
 
 	if (!InteractableComponent)
 	{
@@ -223,6 +232,12 @@ void AInteractableActor_Master::EndPlay(EEndPlayReason::Type EndPlayReason)
 			Sub->UnregisterInteractable(this);
 		}
 	}
+	// Unregister from save system
+	if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+	{
+		Registry->UnregisterSaveable(GetSaveID_Implementation());
+	}
+
 	UDebugSubsystem::PrintDebug(this, DebugTag_InventoryInteraction, TEXT("✅ EndPlay completed"));
 	Super::EndPlay(EndPlayReason);
 }
@@ -1599,4 +1614,203 @@ void AInteractableActor_Master::OnRep_IsBeingHeld()
 void AInteractableActor_Master::OnRep_HoldingActor()
 {
 	// Visual feedback if needed
+}
+
+// ============================================================================
+// SAVE SYSTEM (ISaveableInterface) — ORCHESTRATOR PATTERN
+// ============================================================================
+
+FString AInteractableActor_Master::GetSaveID_Implementation() const
+{
+	return GetPathName();
+}
+
+int32 AInteractableActor_Master::GetSavePriority_Implementation() const
+{
+	return 25;
+}
+
+FGameplayTag AInteractableActor_Master::GetSaveType_Implementation() const
+{
+	return FWWTagLibrary::Save_Type_LevelPlaced();
+}
+
+bool AInteractableActor_Master::SaveState_Implementation(FSaveRecord& OutRecord)
+{
+	FActorSaveEnvelope Envelope = SaveActorWithComponents();
+	if (!Envelope.IsValid()) return false;
+
+	// Serialize the envelope USTRUCT into binary via StaticStruct
+	TArray<uint8> BinaryData;
+	FMemoryWriter MemoryWriter(BinaryData, true);
+	FActorSaveEnvelope::StaticStruct()->SerializeBin(MemoryWriter, &Envelope);
+
+	OutRecord.RecordID = FName(*GetSaveID_Implementation());
+	OutRecord.RecordType = FWWTagLibrary::Save_Category_Actor();
+	OutRecord.BinaryData = MoveTemp(BinaryData);
+	OutRecord.Timestamp = FDateTime::Now();
+	OutRecord.Priority = GetSavePriority_Implementation();
+
+	return true;
+}
+
+bool AInteractableActor_Master::LoadState_Implementation(const FSaveRecord& InRecord)
+{
+	if (InRecord.BinaryData.Num() == 0) return false;
+
+	// Deserialize the envelope USTRUCT from binary via StaticStruct
+	FMemoryReader MemoryReader(InRecord.BinaryData, true);
+	FActorSaveEnvelope Envelope;
+	FActorSaveEnvelope::StaticStruct()->SerializeBin(MemoryReader, &Envelope);
+
+	if (!Envelope.IsValid()) return false;
+
+	return LoadActorWithComponents(Envelope);
+}
+
+bool AInteractableActor_Master::IsDirty_Implementation() const
+{
+	if (bSaveDirty) return true;
+
+	// Check if any saveable component is dirty
+	TArray<UActorComponent*> Components;
+	GetComponents(Components);
+	for (UActorComponent* Comp : Components)
+	{
+		if (Comp && Comp->GetClass()->ImplementsInterface(USaveableInterface::StaticClass()))
+		{
+			if (ISaveableInterface::Execute_IsDirty(Comp))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void AInteractableActor_Master::ClearDirty_Implementation()
+{
+	bSaveDirty = false;
+
+	// Clear dirty on all saveable components
+	TArray<UActorComponent*> Components;
+	GetComponents(Components);
+	for (UActorComponent* Comp : Components)
+	{
+		if (Comp && Comp->GetClass()->ImplementsInterface(USaveableInterface::StaticClass()))
+		{
+			ISaveableInterface::Execute_ClearDirty(Comp);
+		}
+	}
+}
+
+void AInteractableActor_Master::OnSaveDataLoaded_Implementation()
+{
+	// Refresh visual state after load
+	if (AssetPackage.bIsLoaded)
+	{
+		ApplyLoadedMeshes();
+	}
+}
+
+FActorSaveEnvelope AInteractableActor_Master::SaveActorWithComponents() const
+{
+	FActorSaveEnvelope Envelope;
+	Envelope.ActorSaveID = GetPathName();
+	Envelope.ActorClass = FSoftClassPath(GetClass());
+	Envelope.ActorTransform = GetActorTransform();
+	Envelope.SaveType = FWWTagLibrary::Save_Type_LevelPlaced();
+	Envelope.SaveTimestamp = FDateTime::Now();
+
+	if (ULevel* Level = GetLevel())
+	{
+		Envelope.LevelName = GetWorld()->GetMapName();
+	}
+
+	// Serialize actor's own SaveGame properties
+	{
+		FMemoryWriter MemoryWriter(Envelope.ActorBinaryData, true);
+		FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
+		Ar.ArIsSaveGame = true;
+		Ar.ArNoDelta = false;
+		const_cast<AInteractableActor_Master*>(this)->Serialize(Ar);
+	}
+
+	// Iterate all components implementing ISaveableInterface
+	TArray<UActorComponent*> Components;
+	GetComponents(Components);
+	for (UActorComponent* Comp : Components)
+	{
+		if (!Comp || !Comp->GetClass()->ImplementsInterface(USaveableInterface::StaticClass()))
+		{
+			continue;
+		}
+
+		FSaveRecord CompRecord;
+		if (ISaveableInterface::Execute_SaveState(Comp, CompRecord))
+		{
+			FComponentSaveRecord ComponentSave;
+			ComponentSave.ComponentSaveID = CompRecord.RecordID.ToString();
+			ComponentSave.ComponentClass = FName(*Comp->GetClass()->GetName());
+			ComponentSave.BinaryData = MoveTemp(CompRecord.BinaryData);
+
+			Envelope.ComponentRecords.Add(ComponentSave.ComponentSaveID, MoveTemp(ComponentSave));
+		}
+	}
+
+	return Envelope;
+}
+
+bool AInteractableActor_Master::LoadActorWithComponents(const FActorSaveEnvelope& Envelope)
+{
+	if (!Envelope.IsValid()) return false;
+
+	// Handle destroyed actors
+	if (Envelope.bIsDestroyed)
+	{
+		Destroy();
+		return true;
+	}
+
+	// Restore actor transform
+	SetActorTransform(Envelope.ActorTransform);
+
+	// Restore actor's own SaveGame properties
+	if (Envelope.ActorBinaryData.Num() > 0)
+	{
+		FMemoryReader MemoryReader(Envelope.ActorBinaryData, true);
+		FObjectAndNameAsStringProxyArchive Ar(MemoryReader, false);
+		Ar.ArIsSaveGame = true;
+		Serialize(Ar);
+	}
+
+	// Restore component states
+	TArray<UActorComponent*> Components;
+	GetComponents(Components);
+	for (UActorComponent* Comp : Components)
+	{
+		if (!Comp || !Comp->GetClass()->ImplementsInterface(USaveableInterface::StaticClass()))
+		{
+			continue;
+		}
+
+		FString CompSaveID = ISaveableInterface::Execute_GetSaveID(Comp);
+		if (const FComponentSaveRecord* CompRecord = Envelope.ComponentRecords.Find(CompSaveID))
+		{
+			FSaveRecord LoadRecord;
+			LoadRecord.RecordID = FName(*CompRecord->ComponentSaveID);
+			LoadRecord.BinaryData = CompRecord->BinaryData;
+			ISaveableInterface::Execute_LoadState(Comp, LoadRecord);
+		}
+	}
+
+	// Call post-load on self
+	OnSaveDataLoaded_Implementation();
+
+	return true;
+}
+
+void AInteractableActor_Master::MarkSaveDirty()
+{
+	bSaveDirty = true;
 }

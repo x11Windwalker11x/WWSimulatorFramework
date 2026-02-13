@@ -2,6 +2,11 @@
 
 #include "UserSettingsSaveModule.h"
 #include "Kismet/GameplayStatics.h"
+#include "Subsystems/SaveSystem/SaveableRegistrySubsystem.h"
+#include "Interfaces/ModularSaveGameSystem/SaveableInterface.h"
+#include "Lib/Data/Tags/WW_TagLibrary.h"
+#include "Engine/World.h"
+#include "EngineUtils.h"
 
 const FString UMasterSaveSubsystem::DEFAULT_SAVE_SLOT = TEXT("DefaultSave");
 
@@ -232,4 +237,131 @@ FString UMasterSaveSubsystem::GetSaveSlotName(const FString& ProvidedName) const
 UUserSettingsSaveModule* UMasterSaveSubsystem::GetUserSettingsModule()
 {
     return GetOrCreateModule<UUserSettingsSaveModule>();
+}
+
+UWorldStateSaveModule* UMasterSaveSubsystem::GetWorldStateModule()
+{
+    return GetOrCreateModule<UWorldStateSaveModule>();
+}
+
+// ============================================================================
+// WORLD STATE SAVE/LOAD
+// ============================================================================
+
+bool UMasterSaveSubsystem::SaveWorldState(const FString& LevelName)
+{
+    UWorldStateSaveModule* WorldModule = GetWorldStateModule();
+    if (!WorldModule) return false;
+
+    USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this);
+    if (!Registry) return false;
+
+    // Get all dirty saveables sorted by priority
+    TArray<UObject*> DirtySaveables = Registry->GetDirtySaveables();
+
+    int32 SavedCount = 0;
+    for (UObject* Saveable : DirtySaveables)
+    {
+        if (!Saveable || !IsValid(Saveable)) continue;
+
+        // Only save actor-level saveables (components are saved by their owning actor's orchestrator)
+        FGameplayTag SaveType = ISaveableInterface::Execute_GetSaveType(Saveable);
+        if (!SaveType.MatchesTag(FWWTagLibrary::Save_Category_Actor())) continue;
+
+        FSaveRecord Record;
+        if (ISaveableInterface::Execute_SaveState(Saveable, Record))
+        {
+            // Build envelope from the record's binary data
+            if (Record.BinaryData.Num() > 0)
+            {
+                FMemoryReader MemoryReader(Record.BinaryData, true);
+                FActorSaveEnvelope Envelope;
+                FActorSaveEnvelope::StaticStruct()->SerializeBin(MemoryReader, &Envelope);
+
+                if (Envelope.IsValid())
+                {
+                    Envelope.LevelName = LevelName;
+                    WorldModule->SaveActorState(Envelope);
+                    SavedCount++;
+                }
+            }
+        }
+    }
+
+    // Clear dirty flags on all saved objects
+    if (SavedCount > 0)
+    {
+        Registry->MarkAllClean();
+    }
+
+    return SavedCount > 0;
+}
+
+bool UMasterSaveSubsystem::LoadWorldState(const FString& LevelName)
+{
+    UWorldStateSaveModule* WorldModule = GetWorldStateModule();
+    if (!WorldModule) return false;
+
+    UWorld* World = GetWorld();
+    if (!World) return false;
+
+    TArray<FActorSaveEnvelope> Envelopes = WorldModule->GetAllActorsForLevel(LevelName);
+    if (Envelopes.Num() == 0)
+    {
+        OnWorldStateLoaded.Broadcast(LevelName);
+        return true;
+    }
+
+    // Sort envelopes by the actor SaveType: actors with lower priority numbers load first
+    int32 RestoredCount = 0;
+
+    for (const FActorSaveEnvelope& Envelope : Envelopes)
+    {
+        if (!Envelope.IsValid()) continue;
+
+        // Handle destroyed actors
+        if (Envelope.bIsDestroyed)
+        {
+            // Find and destroy the actor
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                if (It->GetPathName() == Envelope.ActorSaveID)
+                {
+                    It->Destroy();
+                    RestoredCount++;
+                    break;
+                }
+            }
+            continue;
+        }
+
+        // Find the level-placed actor by path name
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (Actor->GetPathName() != Envelope.ActorSaveID) continue;
+
+            if (!Actor->GetClass()->ImplementsInterface(USaveableInterface::StaticClass())) continue;
+
+            // Serialize the envelope back to binary for the actor's LoadState
+            TArray<uint8> BinaryData;
+            FMemoryWriter MemoryWriter(BinaryData, true);
+            FActorSaveEnvelope::StaticStruct()->SerializeBin(MemoryWriter, const_cast<FActorSaveEnvelope*>(&Envelope));
+
+            FSaveRecord LoadRecord;
+            LoadRecord.RecordID = FName(*Envelope.ActorSaveID);
+            LoadRecord.RecordType = FWWTagLibrary::Save_Category_Actor();
+            LoadRecord.BinaryData = MoveTemp(BinaryData);
+
+            bool bSuccess = ISaveableInterface::Execute_LoadState(Actor, LoadRecord);
+            if (bSuccess)
+            {
+                RestoredCount++;
+            }
+            break;
+        }
+    }
+
+    OnWorldStateLoaded.Broadcast(LevelName);
+    return RestoredCount > 0;
 }

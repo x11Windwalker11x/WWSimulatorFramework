@@ -26,6 +26,9 @@
 #include "Interfaces/ModularInventorySystem/InventoryInterface.h"
 #include "Interfaces/SimulatorFramework/DurabilityInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "Subsystems/SaveSystem/SaveableRegistrySubsystem.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "Lib/Data/Tags/WW_TagLibrary.h"
 
 // ============================================================================
 // CONSTRUCTION
@@ -200,6 +203,11 @@ void UInteractableComponent::BeginPlay()
          SetComponentTickEnabled(true);
       }
    }
+
+   if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+   {
+      Registry->RegisterSaveable(this);
+   }
 }
 
 // ============================================================================
@@ -250,6 +258,11 @@ void UInteractableComponent::SetupInitialShapeColor()
 
 void UInteractableComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+    {
+        Registry->UnregisterSaveable(GetSaveID_Implementation());
+    }
+
     // Unregister from spatial hash grid
     if (AActor* Owner = GetOwner())
     {
@@ -555,7 +568,9 @@ void UInteractableComponent::SetEnabled(bool bEnabled)
        ShowPrompt();
     }
     
-    FString Message = FString::Printf(TEXT("InteractableComponent: %s - Enabled set to %s"), 
+    MarkSaveDirty();
+
+    FString Message = FString::Printf(TEXT("InteractableComponent: %s - Enabled set to %s"),
        *GetOwner()->GetName(), bIsEnabled ? TEXT("TRUE") : TEXT("FALSE"));
     UDebugSubsystem::PrintDebug(this, DebugTag_Interaction, Message, true, EDebugVerbosity::Verbose);
 }
@@ -799,4 +814,83 @@ void UInteractableComponent::OnRep_IsEnabled()
 	{
 		HidePrompt();
 	}
+}
+
+// ============================================================================
+// SAVE SYSTEM (ISaveableInterface)
+// ============================================================================
+
+FString UInteractableComponent::GetSaveID_Implementation() const
+{
+	if (AActor* OwnerActor = GetOwner())
+	{
+		return FString::Printf(TEXT("%s.%s"), *OwnerActor->GetPathName(), *GetClass()->GetName());
+	}
+	return FString();
+}
+
+int32 UInteractableComponent::GetSavePriority_Implementation() const
+{
+	return 105;
+}
+
+FGameplayTag UInteractableComponent::GetSaveType_Implementation() const
+{
+	return FWWTagLibrary::Save_Category_Component();
+}
+
+bool UInteractableComponent::SaveState_Implementation(FSaveRecord& OutRecord)
+{
+	TArray<uint8> BinaryData;
+	FMemoryWriter MemoryWriter(BinaryData, true);
+	FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
+	Ar.ArIsSaveGame = true;
+	Ar.ArNoDelta = false;
+
+	const_cast<UInteractableComponent*>(this)->Serialize(Ar);
+
+	OutRecord.RecordID = FName(*GetSaveID_Implementation());
+	OutRecord.RecordType = FWWTagLibrary::Save_Category_Component();
+	OutRecord.BinaryData = MoveTemp(BinaryData);
+	OutRecord.Timestamp = FDateTime::Now();
+	OutRecord.Priority = GetSavePriority_Implementation();
+
+	return true;
+}
+
+bool UInteractableComponent::LoadState_Implementation(const FSaveRecord& InRecord)
+{
+	if (InRecord.BinaryData.Num() == 0)
+	{
+		return false;
+	}
+
+	FMemoryReader MemoryReader(InRecord.BinaryData, true);
+	FObjectAndNameAsStringProxyArchive Ar(MemoryReader, false);
+	Ar.ArIsSaveGame = true;
+
+	Serialize(Ar);
+	OnSaveDataLoaded_Implementation();
+
+	return true;
+}
+
+bool UInteractableComponent::IsDirty_Implementation() const
+{
+	return bSaveDirty;
+}
+
+void UInteractableComponent::ClearDirty_Implementation()
+{
+	bSaveDirty = false;
+}
+
+void UInteractableComponent::OnSaveDataLoaded_Implementation()
+{
+	OnRep_IsEnabled();
+}
+
+void UInteractableComponent::MarkSaveDirty()
+{
+	bSaveDirty = true;
 }

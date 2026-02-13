@@ -13,6 +13,8 @@
 #include "Components/SphereComponent.h"
 #include "Interfaces/ModularInteractionSystem//InteractableInterface.h"
 #include "Interfaces/SimulatorFramework/PhysicalInteractionInterface.h"
+#include "Interfaces/ModularSaveGameSystem/SaveableInterface.h"
+#include "Lib/Data/ModularSaveGameSystem/ActorSaveData.h"
 #include "InteractionSubsystem.h"
 #include "InteractionSystem/InteractionPredictionState.h"
 #include "Interfaces/SimulatorFramework/PhysicalInteractionInterface.h"
@@ -31,7 +33,7 @@
  * This is abstract - extend in Blueprints or C++ for concrete interactables.
  */
 UCLASS(Abstract, Blueprintable)
-class MODULARINVENTORYSYSTEM_API AInteractableActor_Master : public AActor, public IInteractableInterface, public IPhysicalInteractionInterface
+class MODULARINVENTORYSYSTEM_API AInteractableActor_Master : public AActor, public IInteractableInterface, public IPhysicalInteractionInterface, public ISaveableInterface
 {
 	GENERATED_BODY()
 
@@ -228,7 +230,7 @@ protected:
 	FName ID;
 
 	//Config Data to pass on other modules
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Config|Pickup")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Config|Pickup")
 	FItemData_Dynamic PickupData;
 
 	
@@ -270,13 +272,13 @@ protected:
 	// INTERACTION STATE
 	// ============================================================================
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Interactable")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Interactable")
 	bool bIsCurrentlyInteractable = true;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interactable")
 	bool bIsPlayerNearby = false;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interactable")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Interactable")
 	bool bInteractionEnabled = true;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Interaction")
@@ -419,4 +421,25 @@ protected:
 	bool Internal_Grab(AActor* GrabbingActor);
 	bool Internal_Release(AActor* ReleasingActor);
 
+	// ============================================================================
+	// SAVE SYSTEM (ISaveableInterface) — ORCHESTRATOR PATTERN
+	// ============================================================================
+
+	virtual FString GetSaveID_Implementation() const override;
+	virtual int32 GetSavePriority_Implementation() const override;
+	virtual FGameplayTag GetSaveType_Implementation() const override;
+	virtual bool SaveState_Implementation(FSaveRecord& OutRecord) override;
+	virtual bool LoadState_Implementation(const FSaveRecord& InRecord) override;
+	virtual bool IsDirty_Implementation() const override;
+	virtual void ClearDirty_Implementation() override;
+	virtual void OnSaveDataLoaded_Implementation() override;
+
+	/** Build complete actor + component save envelope */
+	FActorSaveEnvelope SaveActorWithComponents() const;
+
+	/** Restore actor + component state from envelope */
+	bool LoadActorWithComponents(const FActorSaveEnvelope& Envelope);
+
+	bool bSaveDirty = false;
+	void MarkSaveDirty();
 };
