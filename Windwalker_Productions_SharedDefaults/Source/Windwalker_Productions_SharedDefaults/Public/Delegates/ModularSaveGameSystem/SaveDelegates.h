@@ -22,6 +22,20 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
 	FName, SlotName,
 	bool, bSucceeded);
 
+// --- Master Save/Load Complete Delegates ---
+
+/** Broadcast when the master save game finishes saving */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnMasterSaveComplete,
+	bool, bSuccess,
+	const FString&, SaveSlotName);
+
+/** Broadcast when the master save game finishes loading */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnMasterLoadComplete,
+	bool, bSuccess,
+	const FString&, SaveSlotName);
+
 // --- Registry Delegates (SaveableRegistrySubsystem) ---
 
 /** Broadcast when a saveable object registers with the registry */

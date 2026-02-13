@@ -28,8 +28,7 @@ public class ModularSaveGameSystem : ModuleRules
 				"Core",
 				"GameplayTags",
 				"Windwalker_Productions_SharedDefaults",
-				"ModularSystemsBase",
-				"ModularInventorySystem"
+				"ModularSystemsBase"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

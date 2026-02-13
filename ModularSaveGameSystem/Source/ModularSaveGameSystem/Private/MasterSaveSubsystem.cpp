@@ -322,6 +322,7 @@ bool UMasterSaveSubsystem::LoadWorldState(const FString& LevelName)
         // Handle destroyed actors
         if (Envelope.bIsDestroyed)
         {
+            bool bFoundAndDestroyed = false;
             // Find and destroy the actor
             for (TActorIterator<AActor> It(World); It; ++It)
             {
@@ -329,13 +330,16 @@ bool UMasterSaveSubsystem::LoadWorldState(const FString& LevelName)
                 {
                     It->Destroy();
                     RestoredCount++;
+                    bFoundAndDestroyed = true;
                     break;
                 }
             }
+            OnActorStateRestored.Broadcast(Envelope.ActorSaveID, bFoundAndDestroyed);
             continue;
         }
 
         // Find the level-placed actor by path name
+        bool bActorRestored = false;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             AActor* Actor = *It;
@@ -353,13 +357,14 @@ bool UMasterSaveSubsystem::LoadWorldState(const FString& LevelName)
             LoadRecord.RecordType = FWWTagLibrary::Save_Category_Actor();
             LoadRecord.BinaryData = MoveTemp(BinaryData);
 
-            bool bSuccess = ISaveableInterface::Execute_LoadState(Actor, LoadRecord);
-            if (bSuccess)
+            bActorRestored = ISaveableInterface::Execute_LoadState(Actor, LoadRecord);
+            if (bActorRestored)
             {
                 RestoredCount++;
             }
             break;
         }
+        OnActorStateRestored.Broadcast(Envelope.ActorSaveID, bActorRestored);
     }
 
     OnWorldStateLoaded.Broadcast(LevelName);

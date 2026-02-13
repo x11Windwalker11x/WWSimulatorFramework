@@ -11,10 +11,6 @@
 #include "Delegates/ModularSaveGameSystem/SaveDelegates.h"
 #include "MasterSaveSubsystem.generated.h"
 
-// Delegate declarations
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMasterSaveComplete, bool, bSuccess, const FString&, SaveSlotName);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMasterLoadComplete, bool, bSuccess, const FString&, SaveSlotName);
-
 /**
  * Subsystem that manages the master save game with modular components
  * This replaces the previous InventorySaveSubsystem with a more flexible approach
@@ -196,6 +192,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Master Save|World State")
 	FOnWorldStateLoaded OnWorldStateLoaded;
+
+	UPROPERTY(BlueprintAssignable, Category = "Master Save|World State")
+	FOnActorStateRestored OnActorStateRestored;
 
 protected:
 	// Internal save/load operations

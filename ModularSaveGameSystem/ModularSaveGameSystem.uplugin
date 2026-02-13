@@ -28,22 +28,10 @@
 			"LoadingPhase": "PostEngineInit"
 		},
 		{
-			"Name": "ModularInventorySystem",
+			"Name": "ModularSystemsBase",
 			"Type": "Runtime",
 			"Enabled": true,
 			"LoadingPhase": "PreDefault"
-		},
-		{
-			"Name": "ModularInteractionSystem",
-			"Type": "Runtime",
-			"Enabled": true,
-			"LoadingPhase": "PostEngineInit"
-		},
-		{
-			"Name": "SimulatorFramework",
-			"Type": "Runtime",
-			"Enabled": true,
-			"LoadingPhase": "PostEngineInit"
 		}
 	],
 	"SupportURL": ""
