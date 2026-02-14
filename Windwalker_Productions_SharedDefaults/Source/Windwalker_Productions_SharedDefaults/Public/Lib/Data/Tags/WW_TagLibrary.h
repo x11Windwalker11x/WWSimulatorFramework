@@ -907,6 +907,25 @@ public:
 
     /** UI.Widget.Category.TimeWeather - Widget category for time/weather HUD */
     static const FGameplayTag& UI_Widget_Category_TimeWeather();
+
+    // ================================================================
+    // SLEEP SYSTEM TAGS
+    // ================================================================
+
+    /** Sleep.State.Awake - Player is awake (default) */
+    static const FGameplayTag& Sleep_State_Awake();
+    /** Sleep.State.Initiating - Sleep requested, waiting for vote/confirmation */
+    static const FGameplayTag& Sleep_State_Initiating();
+    /** Sleep.State.Sleeping - Player is actively sleeping (time fast-forwarding) */
+    static const FGameplayTag& Sleep_State_Sleeping();
+    /** Sleep.State.Waking - Player is waking up */
+    static const FGameplayTag& Sleep_State_Waking();
+    /** Sleep.Vote.Pending - MP sleep vote in progress */
+    static const FGameplayTag& Sleep_Vote_Pending();
+    /** Sleep.Vote.Approved - MP sleep vote approved */
+    static const FGameplayTag& Sleep_Vote_Approved();
+    /** Sleep.Vote.Rejected - MP sleep vote rejected */
+    static const FGameplayTag& Sleep_Vote_Rejected();
 };
 
 

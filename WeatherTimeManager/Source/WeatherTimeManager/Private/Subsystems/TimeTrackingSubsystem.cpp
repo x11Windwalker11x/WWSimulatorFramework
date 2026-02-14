@@ -1,6 +1,7 @@
 // Copyright Windwalker Productions. All Rights Reserved.
 
 #include "Subsystems/TimeTrackingSubsystem.h"
+#include "Networking/SleepManagerAuthority.h"
 #include "Interfaces/WeatherTimeManager/TimeWeatherProviderInterface.h"
 #include "Lib/Data/Tags/WW_TagLibrary.h"
 #include "Engine/GameInstance.h"
@@ -8,6 +9,7 @@
 #include "TimerManager.h"
 #include "HAL/IConsoleManager.h"
 #include "EngineUtils.h"
+#include "GameFramework/PlayerState.h"
 
 // ============================================================================
 // CONSOLE COMMAND REGISTRATION
@@ -35,6 +37,18 @@ static FAutoConsoleCommandWithWorldAndArgs GCmdSetWeather(
 	TEXT("WW.SetWeather"),
 	TEXT("Set weather immediately. Usage: WW.SetWeather Weather.Type.Rain"),
 	FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&UTimeTrackingSubsystem::CmdSetWeather)
+);
+
+static FAutoConsoleCommandWithWorldAndArgs GCmdSleep(
+	TEXT("WW.Sleep"),
+	TEXT("Sleep until target hour. Usage: WW.Sleep 6"),
+	FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&UTimeTrackingSubsystem::CmdSleep)
+);
+
+static FAutoConsoleCommandWithWorldAndArgs GCmdCancelSleep(
+	TEXT("WW.CancelSleep"),
+	TEXT("Cancel active sleep. Usage: WW.CancelSleep"),
+	FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&UTimeTrackingSubsystem::CmdCancelSleep)
 );
 
 // ============================================================================
@@ -69,6 +83,12 @@ void UTimeTrackingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UTimeTrackingSubsystem::Deinitialize()
 {
+	// Cancel sleep on map transition / shutdown
+	if (IsSleeping())
+	{
+		CancelSleep(nullptr);
+	}
+
 	StopTimeProgression();
 	SkyProviders.Empty();
 
@@ -316,6 +336,12 @@ void UTimeTrackingSubsystem::OnTimerTick()
 	{
 		UpdateWeatherTransition(TickInterval);
 	}
+
+	// Check sleep completion
+	if (IsSleeping())
+	{
+		HandleSleepTick();
+	}
 }
 
 void UTimeTrackingSubsystem::AdvanceTime(float DeltaSeconds)
@@ -471,6 +497,284 @@ UWorld* UTimeTrackingSubsystem::GetWorldForTimers() const
 }
 
 // ============================================================================
+// SLEEP API
+// ============================================================================
+
+void UTimeTrackingSubsystem::RequestSleep(float TargetWakeHour, float SpeedMultiplier)
+{
+	// Already sleeping?
+	if (IsSleeping())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TimeTrackingSubsystem::RequestSleep - Already sleeping"));
+		return;
+	}
+
+	// Clamp target hour
+	TargetWakeHour = FMath::Fmod(TargetWakeHour, 24.0f);
+	if (TargetWakeHour < 0.0f)
+	{
+		TargetWakeHour += 24.0f;
+	}
+
+	// Store request
+	SleepRequest.SleepStateTag = FWWTagLibrary::Sleep_State_Initiating();
+	SleepRequest.TargetWakeHour = TargetWakeHour;
+	SleepRequest.OriginalTimeSpeed = TimeState.TimeSpeedMultiplier;
+	SleepRequest.SleepSpeedMultiplier = FMath::Max(1.0f, SpeedMultiplier);
+	SleepRequest.SleepStartHour = TimeState.CurrentHour;
+	SleepRequest.RequestingPlayerID = 0; // SP default
+
+	OnSleepRequested.Broadcast(nullptr, TargetWakeHour);
+
+	// SP: immediate. MP: would go through ASleepManagerAuthority
+	if (!IsMultiplayerSession())
+	{
+		BeginSleep();
+	}
+	else
+	{
+		// MP path: init vote
+		SleepVoteState = FSleepVoteState();
+		SleepVoteState.VoteStartTime = FPlatformTime::Seconds();
+		SleepVoteState.VotesFor.Add(SleepRequest.RequestingPlayerID);
+		OnSleepVoteChanged.Broadcast(SleepVoteState.VotesFor.Num(), SleepVoteState.VotesAgainst.Num(), 0);
+		EvaluateSleepVote();
+	}
+}
+
+void UTimeTrackingSubsystem::BeginSleep()
+{
+	SleepRequest.SleepStateTag = FWWTagLibrary::Sleep_State_Sleeping();
+
+	// Store and override time speed
+	SetTimeSpeed(SleepRequest.SleepSpeedMultiplier);
+
+	// Ensure time is running
+	if (TimeState.bTimePaused)
+	{
+		ResumeTime();
+	}
+
+	if (!bTimeProgressionActive)
+	{
+		StartTimeProgression();
+	}
+
+	OnSleepStarted.Broadcast(SleepRequest.TargetWakeHour);
+
+	UE_LOG(LogTemp, Log, TEXT("Sleep started: %.1f -> %.1f (speed: %.0fx)"),
+		SleepRequest.SleepStartHour, SleepRequest.TargetWakeHour, SleepRequest.SleepSpeedMultiplier);
+}
+
+void UTimeTrackingSubsystem::CompleteSleep()
+{
+	const float HoursSlept = [this]()
+	{
+		float Delta = SleepRequest.TargetWakeHour - SleepRequest.SleepStartHour;
+		if (Delta < 0.0f)
+		{
+			Delta += 24.0f;
+		}
+		return Delta;
+	}();
+
+	// Restore original speed
+	SetTimeSpeed(SleepRequest.OriginalTimeSpeed);
+
+	// Snap to exact target hour
+	SetTimeOfDay(SleepRequest.TargetWakeHour);
+
+	SleepRequest.SleepStateTag = FWWTagLibrary::Sleep_State_Waking();
+	OnSleepCompleted.Broadcast(HoursSlept);
+
+	UE_LOG(LogTemp, Log, TEXT("Sleep completed: slept %.1f hours"), HoursSlept);
+
+	// Reset state
+	SleepRequest = FSleepRequest();
+	SleepVoteState = FSleepVoteState();
+}
+
+void UTimeTrackingSubsystem::CancelSleep(APlayerState* CancellingPlayer)
+{
+	if (!IsSleeping() && SleepRequest.SleepStateTag != FWWTagLibrary::Sleep_State_Initiating())
+	{
+		return;
+	}
+
+	// Restore original speed if we were actively sleeping
+	if (SleepRequest.SleepStateTag == FWWTagLibrary::Sleep_State_Sleeping())
+	{
+		SetTimeSpeed(SleepRequest.OriginalTimeSpeed);
+	}
+
+	OnSleepCancelled.Broadcast(CancellingPlayer);
+
+	UE_LOG(LogTemp, Log, TEXT("Sleep cancelled at hour %.1f"), TimeState.CurrentHour);
+
+	// Reset state
+	SleepRequest = FSleepRequest();
+	SleepVoteState = FSleepVoteState();
+}
+
+bool UTimeTrackingSubsystem::IsSleeping() const
+{
+	return SleepRequest.SleepStateTag == FWWTagLibrary::Sleep_State_Sleeping();
+}
+
+float UTimeTrackingSubsystem::GetSleepProgress() const
+{
+	if (!IsSleeping())
+	{
+		return 0.0f;
+	}
+
+	const float Start = SleepRequest.SleepStartHour;
+	const float Target = SleepRequest.TargetWakeHour;
+	const float Current = TimeState.CurrentHour;
+
+	// Total hours to sleep
+	float TotalHours = Target - Start;
+	if (TotalHours <= 0.0f)
+	{
+		TotalHours += 24.0f;
+	}
+
+	// Hours elapsed
+	float ElapsedHours = Current - Start;
+	if (ElapsedHours < 0.0f)
+	{
+		ElapsedHours += 24.0f;
+	}
+
+	return FMath::Clamp(ElapsedHours / TotalHours, 0.0f, 1.0f);
+}
+
+void UTimeTrackingSubsystem::CastSleepVote(int32 PlayerID, bool bApprove)
+{
+	if (SleepRequest.SleepStateTag != FWWTagLibrary::Sleep_State_Initiating())
+	{
+		return;
+	}
+
+	// Double-vote prevention
+	if (SleepVoteState.VotesFor.Contains(PlayerID) || SleepVoteState.VotesAgainst.Contains(PlayerID))
+	{
+		return;
+	}
+
+	if (bApprove)
+	{
+		SleepVoteState.VotesFor.Add(PlayerID);
+	}
+	else
+	{
+		SleepVoteState.VotesAgainst.Add(PlayerID);
+	}
+
+	OnSleepVoteChanged.Broadcast(SleepVoteState.VotesFor.Num(), SleepVoteState.VotesAgainst.Num(), 0);
+	EvaluateSleepVote();
+}
+
+// ============================================================================
+// SLEEP HELPERS
+// ============================================================================
+
+void UTimeTrackingSubsystem::HandleSleepTick()
+{
+	if (HasReachedTargetHour())
+	{
+		CompleteSleep();
+	}
+}
+
+bool UTimeTrackingSubsystem::HasReachedTargetHour() const
+{
+	const float Current = TimeState.CurrentHour;
+	const float Start = SleepRequest.SleepStartHour;
+	const float Target = SleepRequest.TargetWakeHour;
+
+	const bool bWraps = (Start > Target);
+
+	if (bWraps)
+	{
+		// e.g. 22:00 -> 06:00: reached if current >= target AND current < start
+		return (Current >= Target && Current < Start);
+	}
+	else
+	{
+		// e.g. 02:00 -> 06:00: reached if current >= target
+		return (Current >= Target);
+	}
+}
+
+void UTimeTrackingSubsystem::EvaluateSleepVote()
+{
+	// For now in SP, always pass through. MP evaluation will be enhanced in Chunk 3.
+	const int32 TotalVotes = SleepVoteState.VotesFor.Num() + SleepVoteState.VotesAgainst.Num();
+
+	// Check if vote is impossible to pass
+	// (Not implemented fully until MP authority exists — placeholder)
+
+	// For single player or if all votes are in and threshold met
+	if (SleepVoteState.VotesAgainst.Num() > 0)
+	{
+		// Any rejection cancels in default 100% threshold
+		SleepRequest.SleepStateTag = FGameplayTag();
+		OnSleepCancelled.Broadcast(nullptr);
+		SleepRequest = FSleepRequest();
+		SleepVoteState = FSleepVoteState();
+		return;
+	}
+
+	// All votes for? Begin sleep.
+	// (In MP, this would check against total connected players)
+	if (TotalVotes > 0)
+	{
+		BeginSleep();
+	}
+}
+
+bool UTimeTrackingSubsystem::IsMultiplayerSession() const
+{
+	const UWorld* World = GetWorldForTimers();
+	if (!World)
+	{
+		return false;
+	}
+
+	return World->GetNetMode() != NM_Standalone;
+}
+
+ASleepManagerAuthority* UTimeTrackingSubsystem::EnsureSleepAuthority()
+{
+	if (SleepAuthority.IsValid())
+	{
+		return SleepAuthority.Get();
+	}
+
+	UWorld* World = GetWorldForTimers();
+	if (!World || World->GetNetMode() == NM_Client)
+	{
+		return nullptr;
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = nullptr;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	ASleepManagerAuthority* Authority = World->SpawnActor<ASleepManagerAuthority>(
+		ASleepManagerAuthority::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+	if (Authority)
+	{
+		SleepAuthority = Authority;
+		UE_LOG(LogTemp, Log, TEXT("TimeTrackingSubsystem: Spawned ASleepManagerAuthority"));
+	}
+
+	return Authority;
+}
+
+// ============================================================================
 // CONSOLE COMMANDS
 // ============================================================================
 
@@ -570,5 +874,47 @@ void UTimeTrackingSubsystem::CmdSetWeather(const TArray<FString>& Args, UWorld* 
 	{
 		Sub->SetWeatherImmediate(WeatherTag);
 		UE_LOG(LogTemp, Log, TEXT("WW.SetWeather: Set to %s"), *WeatherTag.ToString());
+	}
+}
+
+void UTimeTrackingSubsystem::CmdSleep(const TArray<FString>& Args, UWorld* World)
+{
+	if (Args.Num() < 1 || !World)
+	{
+		return;
+	}
+
+	const float Hour = FCString::Atof(*Args[0]);
+
+	const UGameInstance* GI = World->GetGameInstance();
+	if (!GI)
+	{
+		return;
+	}
+
+	if (UTimeTrackingSubsystem* Sub = GI->GetSubsystem<UTimeTrackingSubsystem>())
+	{
+		Sub->RequestSleep(Hour);
+		UE_LOG(LogTemp, Log, TEXT("WW.Sleep: Requesting sleep until %.1f"), Hour);
+	}
+}
+
+void UTimeTrackingSubsystem::CmdCancelSleep(const TArray<FString>& Args, UWorld* World)
+{
+	if (!World)
+	{
+		return;
+	}
+
+	const UGameInstance* GI = World->GetGameInstance();
+	if (!GI)
+	{
+		return;
+	}
+
+	if (UTimeTrackingSubsystem* Sub = GI->GetSubsystem<UTimeTrackingSubsystem>())
+	{
+		Sub->CancelSleep(nullptr);
+		UE_LOG(LogTemp, Log, TEXT("WW.CancelSleep: Sleep cancelled"));
 	}
 }

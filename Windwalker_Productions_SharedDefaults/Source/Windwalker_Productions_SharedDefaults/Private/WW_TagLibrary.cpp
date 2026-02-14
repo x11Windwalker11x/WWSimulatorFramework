@@ -406,6 +406,15 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Weather_Transition_Complete, "Weather.Transition.Complete");
     UE_DEFINE_GAMEPLAY_TAG(Debug_TimeWeather, "Debug.TimeWeather");
     UE_DEFINE_GAMEPLAY_TAG(UI_Widget_Category_TimeWeather, "UI.Widget.Category.TimeWeather");
+
+    // SLEEP SYSTEM TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Sleep_State_Awake, "Sleep.State.Awake");
+    UE_DEFINE_GAMEPLAY_TAG(Sleep_State_Initiating, "Sleep.State.Initiating");
+    UE_DEFINE_GAMEPLAY_TAG(Sleep_State_Sleeping, "Sleep.State.Sleeping");
+    UE_DEFINE_GAMEPLAY_TAG(Sleep_State_Waking, "Sleep.State.Waking");
+    UE_DEFINE_GAMEPLAY_TAG(Sleep_Vote_Pending, "Sleep.Vote.Pending");
+    UE_DEFINE_GAMEPLAY_TAG(Sleep_Vote_Approved, "Sleep.Vote.Approved");
+    UE_DEFINE_GAMEPLAY_TAG(Sleep_Vote_Rejected, "Sleep.Vote.Rejected");
 }
 
 // Implement public accessor functions
@@ -1773,3 +1782,12 @@ const FGameplayTag& FWWTagLibrary::Weather_Transition_Active() { static const FG
 const FGameplayTag& FWWTagLibrary::Weather_Transition_Complete() { static const FGameplayTag& Tag = WW_Internal::Weather_Transition_Complete; return Tag; }
 const FGameplayTag& FWWTagLibrary::Debug_TimeWeather() { static const FGameplayTag& Tag = WW_Internal::Debug_TimeWeather; return Tag; }
 const FGameplayTag& FWWTagLibrary::UI_Widget_Category_TimeWeather() { static const FGameplayTag& Tag = WW_Internal::UI_Widget_Category_TimeWeather; return Tag; }
+
+// SLEEP SYSTEM TAGS
+const FGameplayTag& FWWTagLibrary::Sleep_State_Awake() { static const FGameplayTag& Tag = WW_Internal::Sleep_State_Awake; return Tag; }
+const FGameplayTag& FWWTagLibrary::Sleep_State_Initiating() { static const FGameplayTag& Tag = WW_Internal::Sleep_State_Initiating; return Tag; }
+const FGameplayTag& FWWTagLibrary::Sleep_State_Sleeping() { static const FGameplayTag& Tag = WW_Internal::Sleep_State_Sleeping; return Tag; }
+const FGameplayTag& FWWTagLibrary::Sleep_State_Waking() { static const FGameplayTag& Tag = WW_Internal::Sleep_State_Waking; return Tag; }
+const FGameplayTag& FWWTagLibrary::Sleep_Vote_Pending() { static const FGameplayTag& Tag = WW_Internal::Sleep_Vote_Pending; return Tag; }
+const FGameplayTag& FWWTagLibrary::Sleep_Vote_Approved() { static const FGameplayTag& Tag = WW_Internal::Sleep_Vote_Approved; return Tag; }
+const FGameplayTag& FWWTagLibrary::Sleep_Vote_Rejected() { static const FGameplayTag& Tag = WW_Internal::Sleep_Vote_Rejected; return Tag; }
