@@ -386,6 +386,26 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Save_Category_Actor, "Save.Category.Actor");
     UE_DEFINE_GAMEPLAY_TAG(Save_Category_Component, "Save.Category.Component");
     UE_DEFINE_GAMEPLAY_TAG(Save_Category_Subsystem, "Save.Category.Subsystem");
+
+    // TIME SYSTEM TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Time_State_Dawn, "Time.State.Dawn");
+    UE_DEFINE_GAMEPLAY_TAG(Time_State_Morning, "Time.State.Morning");
+    UE_DEFINE_GAMEPLAY_TAG(Time_State_Afternoon, "Time.State.Afternoon");
+    UE_DEFINE_GAMEPLAY_TAG(Time_State_Evening, "Time.State.Evening");
+    UE_DEFINE_GAMEPLAY_TAG(Time_State_Dusk, "Time.State.Dusk");
+    UE_DEFINE_GAMEPLAY_TAG(Time_State_Night, "Time.State.Night");
+
+    // WEATHER SYSTEM TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Type_Clear, "Weather.Type.Clear");
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Type_Cloudy, "Weather.Type.Cloudy");
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Type_Rain, "Weather.Type.Rain");
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Type_Fog, "Weather.Type.Fog");
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Type_Snow, "Weather.Type.Snow");
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Type_Storm, "Weather.Type.Storm");
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Transition_Active, "Weather.Transition.Active");
+    UE_DEFINE_GAMEPLAY_TAG(Weather_Transition_Complete, "Weather.Transition.Complete");
+    UE_DEFINE_GAMEPLAY_TAG(Debug_TimeWeather, "Debug.TimeWeather");
+    UE_DEFINE_GAMEPLAY_TAG(UI_Widget_Category_TimeWeather, "UI.Widget.Category.TimeWeather");
 }
 
 // Implement public accessor functions
@@ -1733,3 +1753,23 @@ const FGameplayTag& FWWTagLibrary::Save_Type_PlayerData() { static const FGamepl
 const FGameplayTag& FWWTagLibrary::Save_Category_Actor() { static const FGameplayTag& Tag = WW_Internal::Save_Category_Actor; return Tag; }
 const FGameplayTag& FWWTagLibrary::Save_Category_Component() { static const FGameplayTag& Tag = WW_Internal::Save_Category_Component; return Tag; }
 const FGameplayTag& FWWTagLibrary::Save_Category_Subsystem() { static const FGameplayTag& Tag = WW_Internal::Save_Category_Subsystem; return Tag; }
+
+// TIME SYSTEM TAGS
+const FGameplayTag& FWWTagLibrary::Time_State_Dawn() { static const FGameplayTag& Tag = WW_Internal::Time_State_Dawn; return Tag; }
+const FGameplayTag& FWWTagLibrary::Time_State_Morning() { static const FGameplayTag& Tag = WW_Internal::Time_State_Morning; return Tag; }
+const FGameplayTag& FWWTagLibrary::Time_State_Afternoon() { static const FGameplayTag& Tag = WW_Internal::Time_State_Afternoon; return Tag; }
+const FGameplayTag& FWWTagLibrary::Time_State_Evening() { static const FGameplayTag& Tag = WW_Internal::Time_State_Evening; return Tag; }
+const FGameplayTag& FWWTagLibrary::Time_State_Dusk() { static const FGameplayTag& Tag = WW_Internal::Time_State_Dusk; return Tag; }
+const FGameplayTag& FWWTagLibrary::Time_State_Night() { static const FGameplayTag& Tag = WW_Internal::Time_State_Night; return Tag; }
+
+// WEATHER SYSTEM TAGS
+const FGameplayTag& FWWTagLibrary::Weather_Type_Clear() { static const FGameplayTag& Tag = WW_Internal::Weather_Type_Clear; return Tag; }
+const FGameplayTag& FWWTagLibrary::Weather_Type_Cloudy() { static const FGameplayTag& Tag = WW_Internal::Weather_Type_Cloudy; return Tag; }
+const FGameplayTag& FWWTagLibrary::Weather_Type_Rain() { static const FGameplayTag& Tag = WW_Internal::Weather_Type_Rain; return Tag; }
+const FGameplayTag& FWWTagLibrary::Weather_Type_Fog() { static const FGameplayTag& Tag = WW_Internal::Weather_Type_Fog; return Tag; }
+const FGameplayTag& FWWTagLibrary::Weather_Type_Snow() { static const FGameplayTag& Tag = WW_Internal::Weather_Type_Snow; return Tag; }
+const FGameplayTag& FWWTagLibrary::Weather_Type_Storm() { static const FGameplayTag& Tag = WW_Internal::Weather_Type_Storm; return Tag; }
+const FGameplayTag& FWWTagLibrary::Weather_Transition_Active() { static const FGameplayTag& Tag = WW_Internal::Weather_Transition_Active; return Tag; }
+const FGameplayTag& FWWTagLibrary::Weather_Transition_Complete() { static const FGameplayTag& Tag = WW_Internal::Weather_Transition_Complete; return Tag; }
+const FGameplayTag& FWWTagLibrary::Debug_TimeWeather() { static const FGameplayTag& Tag = WW_Internal::Debug_TimeWeather; return Tag; }
+const FGameplayTag& FWWTagLibrary::UI_Widget_Category_TimeWeather() { static const FGameplayTag& Tag = WW_Internal::UI_Widget_Category_TimeWeather; return Tag; }

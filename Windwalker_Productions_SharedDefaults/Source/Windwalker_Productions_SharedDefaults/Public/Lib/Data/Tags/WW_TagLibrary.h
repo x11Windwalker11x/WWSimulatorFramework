@@ -863,6 +863,50 @@ public:
 
     /** Save.Category.Subsystem - Subsystem-level save record */
     static const FGameplayTag& Save_Category_Subsystem();
+
+    // ================================================================
+    // TIME SYSTEM TAGS
+    // ================================================================
+
+    /** Time.State.Dawn - Dawn period (5:00-7:00) */
+    static const FGameplayTag& Time_State_Dawn();
+    /** Time.State.Morning - Morning (7:00-12:00) */
+    static const FGameplayTag& Time_State_Morning();
+    /** Time.State.Afternoon - Afternoon (12:00-17:00) */
+    static const FGameplayTag& Time_State_Afternoon();
+    /** Time.State.Evening - Evening (17:00-20:00) */
+    static const FGameplayTag& Time_State_Evening();
+    /** Time.State.Dusk - Dusk (20:00-21:00) */
+    static const FGameplayTag& Time_State_Dusk();
+    /** Time.State.Night - Night (21:00-5:00) */
+    static const FGameplayTag& Time_State_Night();
+
+    // ================================================================
+    // WEATHER SYSTEM TAGS
+    // ================================================================
+
+    /** Weather.Type.Clear - Clear sky */
+    static const FGameplayTag& Weather_Type_Clear();
+    /** Weather.Type.Cloudy - Overcast */
+    static const FGameplayTag& Weather_Type_Cloudy();
+    /** Weather.Type.Rain - Rainfall */
+    static const FGameplayTag& Weather_Type_Rain();
+    /** Weather.Type.Fog - Dense fog */
+    static const FGameplayTag& Weather_Type_Fog();
+    /** Weather.Type.Snow - Snowfall */
+    static const FGameplayTag& Weather_Type_Snow();
+    /** Weather.Type.Storm - Thunderstorm */
+    static const FGameplayTag& Weather_Type_Storm();
+    /** Weather.Transition.Active - Transition in progress */
+    static const FGameplayTag& Weather_Transition_Active();
+    /** Weather.Transition.Complete - Transition finished */
+    static const FGameplayTag& Weather_Transition_Complete();
+
+    /** Debug.TimeWeather - Debug layer for time/weather system */
+    static const FGameplayTag& Debug_TimeWeather();
+
+    /** UI.Widget.Category.TimeWeather - Widget category for time/weather HUD */
+    static const FGameplayTag& UI_Widget_Category_TimeWeather();
 };
 
 
