@@ -7,6 +7,7 @@
 #include "Delegates/WeatherTimeManager/SleepDelegates.h"
 #include "Lib/Data/WeatherTimeManager/TimeWeatherData.h"
 #include "Lib/Data/WeatherTimeManager/SleepData.h"
+#include "Interfaces/ModularSaveGameSystem/SaveableInterface.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GameplayTagContainer.h"
 #include "TimeTrackingSubsystem.generated.h"
@@ -28,7 +29,7 @@ class UDaySummaryWidget_Base;
  * Uses FTimerHandle at 10Hz (no tick). Server-authoritative.
  */
 UCLASS()
-class WEATHERTIMEMANAGER_API UTimeTrackingSubsystem : public UGameInstanceSubsystem
+class WEATHERTIMEMANAGER_API UTimeTrackingSubsystem : public UGameInstanceSubsystem, public ISaveableInterface
 {
 	GENERATED_BODY()
 
@@ -284,9 +285,11 @@ private:
 	// ============================================================================
 
 	/** Current time state */
+	UPROPERTY(SaveGame)
 	FTimeOfDayState TimeState;
 
 	/** Current weather state */
+	UPROPERTY(SaveGame)
 	FWeatherState WeatherState;
 
 	/** Time-of-day period thresholds */
@@ -303,12 +306,15 @@ private:
 	FTimerHandle TimeProgressionHandle;
 
 	/** Weather transition duration in seconds */
+	UPROPERTY(SaveGame)
 	float WeatherTransitionDuration = 5.0f;
 
 	/** Weather transition elapsed time */
+	UPROPERTY(SaveGame)
 	float WeatherTransitionElapsed = 0.0f;
 
 	/** Target intensity for weather transition */
+	UPROPERTY(SaveGame)
 	float WeatherTargetIntensity = 1.0f;
 
 	/** Cached previous integer hour (for OnHourChanged detection) */
@@ -409,5 +415,26 @@ private:
 	static void CmdShowSummary(const TArray<FString>& Args, UWorld* World);
 
 	/** Hours slept from last CompleteSleep (for summary) */
+	UPROPERTY(SaveGame)
 	float LastHoursSlept = 0.0f;
+
+	// ============================================================================
+	// SAVE SYSTEM (ISaveableInterface)
+	// ============================================================================
+
+	/** Dirty flag for save system (Rule #40) */
+	bool bSaveDirty = false;
+
+	/** Mark this subsystem as having unsaved changes */
+	void MarkSaveDirty();
+
+	// ISaveableInterface _Implementation methods
+	virtual FString GetSaveID_Implementation() const override;
+	virtual int32 GetSavePriority_Implementation() const override;
+	virtual FGameplayTag GetSaveType_Implementation() const override;
+	virtual bool SaveState_Implementation(FSaveRecord& OutRecord) override;
+	virtual bool LoadState_Implementation(const FSaveRecord& InRecord) override;
+	virtual bool IsDirty_Implementation() const override;
+	virtual void ClearDirty_Implementation() override;
+	virtual void OnSaveDataLoaded_Implementation() override;
 };

@@ -182,6 +182,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Master Save|World State")
 	bool LoadWorldState(const FString& LevelName);
 
+	// ========== Subsystem State Save/Load ==========
+
+	/** Save all dirty subsystem-type saveables to SubsystemSaveRecords */
+	UFUNCTION(BlueprintCallable, Category = "Master Save|Subsystem State")
+	bool SaveSubsystemState();
+
+	/** Load and restore all saved subsystem states from SubsystemSaveRecords */
+	UFUNCTION(BlueprintCallable, Category = "Master Save|Subsystem State")
+	bool LoadSubsystemState();
+
 	// ========== Events ==========
 
 	UPROPERTY(BlueprintAssignable, Category = "Master Save")

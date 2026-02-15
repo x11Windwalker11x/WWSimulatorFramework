@@ -36,6 +36,9 @@ bool UMasterSaveSubsystem::SaveGame(const FString& SaveSlotName, bool bAsync)
     CurrentSaveGame->SaveSlotName = SlotName;
     CurrentSaveGame->UpdateTimestamp();
 
+    // Save subsystem-type saveables before writing to disk
+    SaveSubsystemState();
+
     return SaveGameToSlot(CurrentSaveGame, SlotName, bAsync);
 }
 
@@ -50,6 +53,10 @@ bool UMasterSaveSubsystem::LoadGame(const FString& SaveSlotName)
         CurrentSaveSlotName = SlotName;
         CurrentSaveGame->ValidateAllModules();
         CurrentSaveGame->MigrateAllModules();
+
+        // Restore subsystem-type saveables after successful load
+        LoadSubsystemState();
+
         OnLoadComplete.Broadcast(true, SlotName);
         return true;
     }
@@ -295,6 +302,100 @@ bool UMasterSaveSubsystem::SaveWorldState(const FString& LevelName)
     }
 
     return SavedCount > 0;
+}
+
+// ============================================================================
+// SUBSYSTEM STATE SAVE/LOAD
+// ============================================================================
+
+bool UMasterSaveSubsystem::SaveSubsystemState()
+{
+    if (!CurrentSaveGame)
+    {
+        return false;
+    }
+
+    USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this);
+    if (!Registry)
+    {
+        return false;
+    }
+
+    TArray<UObject*> DirtySaveables = Registry->GetDirtySaveables();
+
+    int32 SavedCount = 0;
+    for (UObject* Saveable : DirtySaveables)
+    {
+        if (!Saveable || !IsValid(Saveable)) continue;
+
+        // Only save subsystem-type saveables
+        FGameplayTag SaveType = ISaveableInterface::Execute_GetSaveType(Saveable);
+        if (!SaveType.MatchesTag(FWWTagLibrary::Save_Category_Subsystem())) continue;
+
+        FSaveRecord Record;
+        if (ISaveableInterface::Execute_SaveState(Saveable, Record))
+        {
+            FString SaveID = ISaveableInterface::Execute_GetSaveID(Saveable);
+            CurrentSaveGame->SubsystemSaveRecords.Add(SaveID, Record);
+            ISaveableInterface::Execute_ClearDirty(Saveable);
+            SavedCount++;
+        }
+    }
+
+    if (SavedCount > 0)
+    {
+        UE_LOG(LogTemp, Log, TEXT("MasterSaveSubsystem::SaveSubsystemState - Saved %d subsystem(s)"), SavedCount);
+    }
+
+    return SavedCount > 0;
+}
+
+bool UMasterSaveSubsystem::LoadSubsystemState()
+{
+    if (!CurrentSaveGame)
+    {
+        return false;
+    }
+
+    if (CurrentSaveGame->SubsystemSaveRecords.Num() == 0)
+    {
+        return true; // No subsystem data to load — not an error
+    }
+
+    USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this);
+    if (!Registry)
+    {
+        return false;
+    }
+
+    int32 RestoredCount = 0;
+    for (const auto& Pair : CurrentSaveGame->SubsystemSaveRecords)
+    {
+        const FString& SaveID = Pair.Key;
+        const FSaveRecord& Record = Pair.Value;
+
+        UObject* Saveable = Registry->GetSaveableByID(SaveID);
+        if (!Saveable || !IsValid(Saveable))
+        {
+            UE_LOG(LogTemp, Warning, TEXT("MasterSaveSubsystem::LoadSubsystemState - Saveable '%s' not found in registry"), *SaveID);
+            continue;
+        }
+
+        if (ISaveableInterface::Execute_LoadState(Saveable, Record))
+        {
+            RestoredCount++;
+            OnActorStateRestored.Broadcast(SaveID, true);
+        }
+        else
+        {
+            OnActorStateRestored.Broadcast(SaveID, false);
+        }
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("MasterSaveSubsystem::LoadSubsystemState - Restored %d/%d subsystem(s)"),
+        RestoredCount, CurrentSaveGame->SubsystemSaveRecords.Num());
+
+    return RestoredCount > 0;
 }
 
 bool UMasterSaveSubsystem::LoadWorldState(const FString& LevelName)

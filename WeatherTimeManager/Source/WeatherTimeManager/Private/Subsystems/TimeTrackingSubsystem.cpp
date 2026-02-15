@@ -7,6 +7,7 @@
 #include "Lib/Data/Tags/WW_TagLibrary.h"
 #include "Lib/Data/WeatherTimeManager/DaySummaryData.h"
 #include "Subsystems/DaySummarySubsystem.h"
+#include "Subsystems/SaveSystem/SaveableRegistrySubsystem.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -14,6 +15,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerState.h"
 #include "Blueprint/UserWidget.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 // ============================================================================
 // CONSOLE COMMAND REGISTRATION
@@ -71,6 +73,7 @@ UTimeTrackingSubsystem::UTimeTrackingSubsystem()
 
 void UTimeTrackingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
+	Collection.InitializeDependency<USaveableRegistrySubsystem>();
 	Super::Initialize(Collection);
 
 	InitDefaultThresholds();
@@ -89,10 +92,22 @@ void UTimeTrackingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	// Evaluate initial period
 	EvaluateTimeOfDayPeriod();
+
+	// Register with save system
+	if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+	{
+		Registry->RegisterSaveable(this);
+	}
 }
 
 void UTimeTrackingSubsystem::Deinitialize()
 {
+	// Unregister from save system
+	if (USaveableRegistrySubsystem* Registry = USaveableRegistrySubsystem::Get(this))
+	{
+		Registry->UnregisterSaveable(TEXT("TimeTrackingSubsystem"));
+	}
+
 	// Cancel sleep on map transition / shutdown
 	if (IsSleeping())
 	{
@@ -151,11 +166,13 @@ void UTimeTrackingSubsystem::SetTimeOfDay(float Hour)
 
 	EvaluateTimeOfDayPeriod();
 	PushStateToProviders();
+	MarkSaveDirty();
 }
 
 void UTimeTrackingSubsystem::SetTimeSpeed(float Multiplier)
 {
 	TimeState.TimeSpeedMultiplier = FMath::Max(0.0f, Multiplier);
+	MarkSaveDirty();
 }
 
 void UTimeTrackingSubsystem::PauseTime()
@@ -164,6 +181,7 @@ void UTimeTrackingSubsystem::PauseTime()
 	{
 		TimeState.bTimePaused = true;
 		OnTimePaused.Broadcast();
+		MarkSaveDirty();
 	}
 }
 
@@ -173,6 +191,7 @@ void UTimeTrackingSubsystem::ResumeTime()
 	{
 		TimeState.bTimePaused = false;
 		OnTimeResumed.Broadcast();
+		MarkSaveDirty();
 	}
 }
 
@@ -231,6 +250,7 @@ void UTimeTrackingSubsystem::SetWeatherImmediate(FGameplayTag WeatherTag, float 
 	}
 
 	PushStateToProviders();
+	MarkSaveDirty();
 }
 
 void UTimeTrackingSubsystem::TransitionToWeather(FGameplayTag TargetWeather, float Duration, float TargetIntensity)
@@ -254,6 +274,7 @@ void UTimeTrackingSubsystem::TransitionToWeather(FGameplayTag TargetWeather, flo
 	WeatherTargetIntensity = FMath::Clamp(TargetIntensity, 0.0f, 1.0f);
 
 	OnWeatherTransitionStarted.Broadcast(WeatherState.CurrentWeatherTag, TargetWeather);
+	MarkSaveDirty();
 }
 
 void UTimeTrackingSubsystem::CancelWeatherTransition()
@@ -264,6 +285,7 @@ void UTimeTrackingSubsystem::CancelWeatherTransition()
 		WeatherState.TransitionAlpha = 0.0f;
 		WeatherState.bTransitioning = false;
 		WeatherTransitionElapsed = 0.0f;
+		MarkSaveDirty();
 	}
 }
 
@@ -381,6 +403,7 @@ void UTimeTrackingSubsystem::AdvanceTime(float DeltaSeconds)
 		const int32 OldHourInt = CachedHour;
 		CachedHour = NewHour;
 		OnHourChanged.Broadcast(OldHourInt, NewHour);
+		MarkSaveDirty();
 	}
 
 	EvaluateTimeOfDayPeriod();
@@ -601,6 +624,7 @@ void UTimeTrackingSubsystem::CompleteSleep()
 
 	// Store for day summary, then show it
 	LastHoursSlept = HoursSlept;
+	MarkSaveDirty();
 
 	// Reset state
 	SleepRequest = FSleepRequest();
@@ -1007,4 +1031,110 @@ void UTimeTrackingSubsystem::CmdCancelSleep(const TArray<FString>& Args, UWorld*
 		Sub->CancelSleep(nullptr);
 		UE_LOG(LogTemp, Log, TEXT("WW.CancelSleep: Sleep cancelled"));
 	}
+}
+
+// ============================================================================
+// SAVE SYSTEM (ISaveableInterface)
+// ============================================================================
+
+void UTimeTrackingSubsystem::MarkSaveDirty()
+{
+	bSaveDirty = true;
+}
+
+FString UTimeTrackingSubsystem::GetSaveID_Implementation() const
+{
+	return TEXT("TimeTrackingSubsystem");
+}
+
+int32 UTimeTrackingSubsystem::GetSavePriority_Implementation() const
+{
+	return 5; // Very early — time loads before gameplay systems
+}
+
+FGameplayTag UTimeTrackingSubsystem::GetSaveType_Implementation() const
+{
+	return FWWTagLibrary::Save_Category_Subsystem();
+}
+
+bool UTimeTrackingSubsystem::SaveState_Implementation(FSaveRecord& OutRecord)
+{
+	OutRecord.RecordID = FName(TEXT("TimeTrackingSubsystem"));
+	OutRecord.RecordType = FWWTagLibrary::Save_Category_Subsystem();
+	OutRecord.Priority = 5;
+	OutRecord.Timestamp = FDateTime::Now();
+	OutRecord.Version = 1;
+
+	// Serialize all UPROPERTY(SaveGame) into binary
+	TArray<uint8> BinaryData;
+	FMemoryWriter MemoryWriter(BinaryData, true);
+	FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, false);
+	Ar.SetIsSaveGame(true);
+	this->Serialize(Ar);
+
+	OutRecord.BinaryData = MoveTemp(BinaryData);
+
+	UE_LOG(LogTemp, Log, TEXT("TimeTrackingSubsystem::SaveState - Saved %d bytes (Hour=%.1f, Day=%d, Weather=%s)"),
+		OutRecord.BinaryData.Num(), TimeState.CurrentHour, TimeState.DayNumber, *WeatherState.CurrentWeatherTag.ToString());
+
+	return OutRecord.BinaryData.Num() > 0;
+}
+
+bool UTimeTrackingSubsystem::LoadState_Implementation(const FSaveRecord& InRecord)
+{
+	if (InRecord.BinaryData.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("TimeTrackingSubsystem::LoadState - Empty binary data"));
+		return false;
+	}
+
+	// Deserialize binary data back into UPROPERTY(SaveGame) members
+	TArray<uint8> BinaryData = InRecord.BinaryData; // Copy for non-const reader
+	FMemoryReader MemoryReader(BinaryData, true);
+	FObjectAndNameAsStringProxyArchive Ar(MemoryReader, false);
+	Ar.SetIsSaveGame(true);
+	this->Serialize(Ar);
+
+	UE_LOG(LogTemp, Log, TEXT("TimeTrackingSubsystem::LoadState - Loaded %d bytes (Hour=%.1f, Day=%d, Weather=%s)"),
+		InRecord.BinaryData.Num(), TimeState.CurrentHour, TimeState.DayNumber, *WeatherState.CurrentWeatherTag.ToString());
+
+	OnSaveDataLoaded_Implementation();
+	return true;
+}
+
+bool UTimeTrackingSubsystem::IsDirty_Implementation() const
+{
+	return bSaveDirty;
+}
+
+void UTimeTrackingSubsystem::ClearDirty_Implementation()
+{
+	bSaveDirty = false;
+}
+
+void UTimeTrackingSubsystem::OnSaveDataLoaded_Implementation()
+{
+	// Sync cached hour from restored state
+	CachedHour = FMath::FloorToInt32(TimeState.CurrentHour);
+
+	// Re-evaluate time-of-day period from restored hour
+	EvaluateTimeOfDayPeriod();
+
+	// Restart time progression if it was running (not paused)
+	if (!TimeState.bTimePaused)
+	{
+		StartTimeProgression();
+	}
+
+	// Push state to sky providers (providers re-discovered on level load)
+	PushStateToProviders();
+
+	// Fire delegates so UI syncs with restored state
+	OnHourChanged.Broadcast(-1, CachedHour);
+	OnTimeOfDayChanged.Broadcast(FGameplayTag(), TimeState.TimeOfDayTag);
+	OnWeatherChanged.Broadcast(FGameplayTag(), WeatherState.CurrentWeatherTag);
+
+	UE_LOG(LogTemp, Log, TEXT("TimeTrackingSubsystem::OnSaveDataLoaded - Restored: Hour=%.1f, Day=%d, Weather=%s, Paused=%s"),
+		TimeState.CurrentHour, TimeState.DayNumber, *WeatherState.CurrentWeatherTag.ToString(),
+		TimeState.bTimePaused ? TEXT("Yes") : TEXT("No"));
 }

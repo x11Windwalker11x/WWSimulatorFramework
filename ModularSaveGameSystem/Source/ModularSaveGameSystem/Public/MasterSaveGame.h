@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "Lib/Data/ModularSaveGameSystem/SaveData.h"
 #include "GameFramework/SaveGame.h"
 #include "MasterSaveGame.generated.h"
 
@@ -88,6 +89,10 @@ public:
 	// Store all save modules by class name for type-safe retrieval
 	UPROPERTY(SaveGame)
 	TMap<FString, UModularSaveData*> SaveModules;
+
+	/** Subsystem-type saveable records (global, not per-level) */
+	UPROPERTY(SaveGame)
+	TMap<FString, FSaveRecord> SubsystemSaveRecords;
 
 	// ========== Module Management ==========
 	

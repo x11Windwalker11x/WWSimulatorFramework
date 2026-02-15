@@ -17,23 +17,23 @@ struct WINDWALKER_PRODUCTIONS_SHAREDDEFAULTS_API FTimeOfDayState
 	GENERATED_BODY()
 
 	/** Current hour as float (0.0 - 24.0), e.g. 13.5 = 1:30 PM */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Time")
 	float CurrentHour = 6.0f;
 
 	/** Current day number (starts at 1) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Time")
 	int32 DayNumber = 1;
 
 	/** Speed multiplier for time progression (1.0 = real-time ratio) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time", meta = (ClampMin = "0.0"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Time", meta = (ClampMin = "0.0"))
 	float TimeSpeedMultiplier = 1.0f;
 
 	/** Whether time progression is paused */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Time")
 	bool bTimePaused = false;
 
 	/** Current time-of-day period tag (Time.State.Dawn, Time.State.Morning, etc.) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Time")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Time")
 	FGameplayTag TimeOfDayTag;
 
 	bool IsValid() const { return CurrentHour >= 0.0f && CurrentHour < 24.0f && DayNumber > 0; }
@@ -77,23 +77,23 @@ struct WINDWALKER_PRODUCTIONS_SHAREDDEFAULTS_API FWeatherState
 	GENERATED_BODY()
 
 	/** Current active weather tag */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Weather")
 	FGameplayTag CurrentWeatherTag;
 
 	/** Target weather tag during transition */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Weather")
 	FGameplayTag TargetWeatherTag;
 
 	/** Transition progress (0.0 = current, 1.0 = target reached) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float TransitionAlpha = 0.0f;
 
 	/** Whether a weather transition is currently in progress */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Weather")
 	bool bTransitioning = false;
 
 	/** Current weather intensity (0.0 - 1.0) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Weather", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float CurrentIntensity = 1.0f;
 
 	bool IsValid() const { return CurrentWeatherTag.IsValid(); }
