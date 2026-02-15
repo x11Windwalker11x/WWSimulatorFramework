@@ -926,6 +926,31 @@ public:
     static const FGameplayTag& Sleep_Vote_Approved();
     /** Sleep.Vote.Rejected - MP sleep vote rejected */
     static const FGameplayTag& Sleep_Vote_Rejected();
+
+    // ================================================================
+    // DAY SUMMARY TAGS
+    // ================================================================
+
+    /** Summary.Category.Economy - Day summary: economy entries */
+    static const FGameplayTag& Summary_Category_Economy();
+    /** Summary.Category.Quest - Day summary: quest entries */
+    static const FGameplayTag& Summary_Category_Quest();
+    /** Summary.Category.Crafting - Day summary: crafting entries */
+    static const FGameplayTag& Summary_Category_Crafting();
+    /** Summary.Category.Inventory - Day summary: inventory entries */
+    static const FGameplayTag& Summary_Category_Inventory();
+    /** Summary.Category.Sleep - Day summary: sleep stats */
+    static const FGameplayTag& Summary_Category_Sleep();
+    /** Summary.Category.Time - Day summary: time entries */
+    static const FGameplayTag& Summary_Category_Time();
+    /** Summary.Icon.Money - Day summary icon: currency */
+    static const FGameplayTag& Summary_Icon_Money();
+    /** Summary.Icon.Quest - Day summary icon: quest */
+    static const FGameplayTag& Summary_Icon_Quest();
+    /** Summary.Icon.Item - Day summary icon: item */
+    static const FGameplayTag& Summary_Icon_Item();
+    /** Summary.Icon.Clock - Day summary icon: clock */
+    static const FGameplayTag& Summary_Icon_Clock();
 };
 
 

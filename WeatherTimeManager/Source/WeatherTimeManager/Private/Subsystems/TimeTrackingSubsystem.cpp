@@ -3,13 +3,17 @@
 #include "Subsystems/TimeTrackingSubsystem.h"
 #include "Networking/SleepManagerAuthority.h"
 #include "Interfaces/WeatherTimeManager/TimeWeatherProviderInterface.h"
+#include "UI/DaySummaryWidget_Base.h"
 #include "Lib/Data/Tags/WW_TagLibrary.h"
+#include "Lib/Data/WeatherTimeManager/DaySummaryData.h"
+#include "Subsystems/DaySummarySubsystem.h"
 #include "Engine/GameInstance.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "HAL/IConsoleManager.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerState.h"
+#include "Blueprint/UserWidget.h"
 
 // ============================================================================
 // CONSOLE COMMAND REGISTRATION
@@ -49,6 +53,12 @@ static FAutoConsoleCommandWithWorldAndArgs GCmdCancelSleep(
 	TEXT("WW.CancelSleep"),
 	TEXT("Cancel active sleep. Usage: WW.CancelSleep"),
 	FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&UTimeTrackingSubsystem::CmdCancelSleep)
+);
+
+static FAutoConsoleCommandWithWorldAndArgs GCmdShowSummary(
+	TEXT("WW.ShowSummary"),
+	TEXT("Force show day-end summary for testing. Usage: WW.ShowSummary"),
+	FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&UTimeTrackingSubsystem::CmdShowSummary)
 );
 
 // ============================================================================
@@ -589,9 +599,15 @@ void UTimeTrackingSubsystem::CompleteSleep()
 
 	UE_LOG(LogTemp, Log, TEXT("Sleep completed: slept %.1f hours"), HoursSlept);
 
+	// Store for day summary, then show it
+	LastHoursSlept = HoursSlept;
+
 	// Reset state
 	SleepRequest = FSleepRequest();
 	SleepVoteState = FSleepVoteState();
+
+	// Show day-end summary after sleep
+	ShowDaySummary();
 }
 
 void UTimeTrackingSubsystem::CancelSleep(APlayerState* CancellingPlayer)
@@ -874,6 +890,80 @@ void UTimeTrackingSubsystem::CmdSetWeather(const TArray<FString>& Args, UWorld* 
 	{
 		Sub->SetWeatherImmediate(WeatherTag);
 		UE_LOG(LogTemp, Log, TEXT("WW.SetWeather: Set to %s"), *WeatherTag.ToString());
+	}
+}
+
+// ============================================================================
+// DAY SUMMARY
+// ============================================================================
+
+void UTimeTrackingSubsystem::ShowDaySummary()
+{
+	UDaySummarySubsystem* SummarySub = UDaySummarySubsystem::Get(this);
+	if (!SummarySub)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ShowDaySummary: DaySummarySubsystem not found"));
+		return;
+	}
+
+	const int32 Day = TimeState.DayNumber;
+	const float HoursSlept = LastHoursSlept;
+
+	// Submit the built-in sleep stats entry
+	FDaySummaryEntry SleepEntry;
+	SleepEntry.CategoryTag = FWWTagLibrary::Summary_Category_Sleep();
+	SleepEntry.DisplayText = FText::Format(
+		NSLOCTEXT("DaySummary", "SleptHours", "Slept {0} hours"),
+		FText::AsNumber(FMath::RoundToInt(HoursSlept)));
+	SleepEntry.IconTag = FWWTagLibrary::Summary_Icon_Clock();
+	SleepEntry.SortOrder = 0;
+	SleepEntry.NumericValue = HoursSlept;
+	SleepEntry.bIsPositive = true;
+	SummarySub->SubmitEntry(SleepEntry);
+
+	// Create widget if class is set
+	if (DaySummaryWidgetClass)
+	{
+		UWorld* World = GetWorldForTimers();
+		if (World)
+		{
+			APlayerController* PC = World->GetFirstPlayerController();
+			if (PC)
+			{
+				UDaySummaryWidget_Base* Widget = CreateWidget<UDaySummaryWidget_Base>(PC, DaySummaryWidgetClass);
+				if (Widget)
+				{
+					Widget->InitializeSummary(Day, HoursSlept);
+					Widget->AddToViewport(100);
+				}
+			}
+		}
+	}
+
+	// Request the summary (broadcasts to contributors, then NextTick finalizes)
+	SummarySub->RequestDaySummary(Day, HoursSlept);
+
+	UE_LOG(LogTemp, Log, TEXT("ShowDaySummary: Day %d, slept %.1f hours"), Day, HoursSlept);
+}
+
+void UTimeTrackingSubsystem::CmdShowSummary(const TArray<FString>& Args, UWorld* World)
+{
+	if (!World)
+	{
+		return;
+	}
+
+	const UGameInstance* GI = World->GetGameInstance();
+	if (!GI)
+	{
+		return;
+	}
+
+	if (UTimeTrackingSubsystem* Sub = GI->GetSubsystem<UTimeTrackingSubsystem>())
+	{
+		Sub->LastHoursSlept = 8.0f; // Default test value
+		Sub->ShowDaySummary();
+		UE_LOG(LogTemp, Log, TEXT("WW.ShowSummary: Forced day summary display"));
 	}
 }
 

@@ -415,6 +415,18 @@ namespace WW_Internal
     UE_DEFINE_GAMEPLAY_TAG(Sleep_Vote_Pending, "Sleep.Vote.Pending");
     UE_DEFINE_GAMEPLAY_TAG(Sleep_Vote_Approved, "Sleep.Vote.Approved");
     UE_DEFINE_GAMEPLAY_TAG(Sleep_Vote_Rejected, "Sleep.Vote.Rejected");
+
+    // DAY SUMMARY TAGS
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Category_Economy, "Summary.Category.Economy");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Category_Quest, "Summary.Category.Quest");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Category_Crafting, "Summary.Category.Crafting");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Category_Inventory, "Summary.Category.Inventory");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Category_Sleep, "Summary.Category.Sleep");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Category_Time, "Summary.Category.Time");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Icon_Money, "Summary.Icon.Money");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Icon_Quest, "Summary.Icon.Quest");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Icon_Item, "Summary.Icon.Item");
+    UE_DEFINE_GAMEPLAY_TAG(Summary_Icon_Clock, "Summary.Icon.Clock");
 }
 
 // Implement public accessor functions
@@ -1791,3 +1803,15 @@ const FGameplayTag& FWWTagLibrary::Sleep_State_Waking() { static const FGameplay
 const FGameplayTag& FWWTagLibrary::Sleep_Vote_Pending() { static const FGameplayTag& Tag = WW_Internal::Sleep_Vote_Pending; return Tag; }
 const FGameplayTag& FWWTagLibrary::Sleep_Vote_Approved() { static const FGameplayTag& Tag = WW_Internal::Sleep_Vote_Approved; return Tag; }
 const FGameplayTag& FWWTagLibrary::Sleep_Vote_Rejected() { static const FGameplayTag& Tag = WW_Internal::Sleep_Vote_Rejected; return Tag; }
+
+// DAY SUMMARY TAGS
+const FGameplayTag& FWWTagLibrary::Summary_Category_Economy() { static const FGameplayTag& Tag = WW_Internal::Summary_Category_Economy; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Category_Quest() { static const FGameplayTag& Tag = WW_Internal::Summary_Category_Quest; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Category_Crafting() { static const FGameplayTag& Tag = WW_Internal::Summary_Category_Crafting; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Category_Inventory() { static const FGameplayTag& Tag = WW_Internal::Summary_Category_Inventory; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Category_Sleep() { static const FGameplayTag& Tag = WW_Internal::Summary_Category_Sleep; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Category_Time() { static const FGameplayTag& Tag = WW_Internal::Summary_Category_Time; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Icon_Money() { static const FGameplayTag& Tag = WW_Internal::Summary_Icon_Money; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Icon_Quest() { static const FGameplayTag& Tag = WW_Internal::Summary_Icon_Quest; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Icon_Item() { static const FGameplayTag& Tag = WW_Internal::Summary_Icon_Item; return Tag; }
+const FGameplayTag& FWWTagLibrary::Summary_Icon_Clock() { static const FGameplayTag& Tag = WW_Internal::Summary_Icon_Clock; return Tag; }

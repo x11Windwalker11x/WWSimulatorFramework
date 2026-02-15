@@ -12,6 +12,8 @@
 #include "TimeTrackingSubsystem.generated.h"
 
 class ASleepManagerAuthority;
+class UDaySummarySubsystem;
+class UDaySummaryWidget_Base;
 
 /**
  * Time Tracking Subsystem
@@ -261,6 +263,21 @@ public:
 	/** Set sleep manager authority reference (called by authority on spawn) */
 	void SetSleepAuthority(ASleepManagerAuthority* Authority) { SleepAuthority = Authority; }
 
+	// ============================================================================
+	// DAY SUMMARY API
+	// ============================================================================
+
+	/**
+	 * Show the day-end summary screen.
+	 * Triggers UDaySummarySubsystem::RequestDaySummary, creates widget, submits sleep entry.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "TimeWeather|DaySummary")
+	void ShowDaySummary();
+
+	/** Widget class to spawn for day summary (set in Blueprint) */
+	UPROPERTY(EditDefaultsOnly, Category = "TimeWeather|DaySummary")
+	TSubclassOf<UDaySummaryWidget_Base> DaySummaryWidgetClass;
+
 private:
 	// ============================================================================
 	// INTERNAL STATE
@@ -387,4 +404,10 @@ private:
 
 	/** Console command: WW.CancelSleep */
 	static void CmdCancelSleep(const TArray<FString>& Args, UWorld* World);
+
+	/** Console command: WW.ShowSummary - Force show day summary for testing */
+	static void CmdShowSummary(const TArray<FString>& Args, UWorld* World);
+
+	/** Hours slept from last CompleteSleep (for summary) */
+	float LastHoursSlept = 0.0f;
 };
